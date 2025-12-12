@@ -158,27 +158,34 @@ function viewOrderDetail(orderId) {
         itemsDiv.appendChild(div);
     });
     
-    // Show notes if any
-    if (order.notes) {
-        document.getElementById('detailNotesText').textContent = order.notes;
-        document.getElementById('detailNotes').style.display = 'block';
-    } else {
-        document.getElementById('detailNotes').style.display = 'none';
+    // Show notes if any - with proper checking
+    const notesElement = document.getElementById('detailNotes');
+    const notesTextElement = document.getElementById('detailNotesText');
+    
+    if (notesElement && notesTextElement) {
+        if (order.notes && order.notes.trim() !== '') {
+            notesTextElement.textContent = order.notes;
+            notesElement.style.display = 'block';
+        } else {
+            notesElement.style.display = 'none';
+        }
     }
     
     // Show appropriate action buttons
     const btnProcessing = document.getElementById('btnProcessing');
     const btnCompleted = document.getElementById('btnCompleted');
     
-    if (order.status === 'pending') {
-        btnProcessing.style.display = 'inline-block';
-        btnCompleted.style.display = 'none';
-    } else if (order.status === 'processing') {
-        btnProcessing.style.display = 'none';
-        btnCompleted.style.display = 'inline-block';
-    } else {
-        btnProcessing.style.display = 'none';
-        btnCompleted.style.display = 'none';
+    if (btnProcessing && btnCompleted) {
+        if (order.status === 'pending') {
+            btnProcessing.style.display = 'inline-block';
+            btnCompleted.style.display = 'none';
+        } else if (order.status === 'processing') {
+            btnProcessing.style.display = 'none';
+            btnCompleted.style.display = 'inline-block';
+        } else {
+            btnProcessing.style.display = 'none';
+            btnCompleted.style.display = 'none';
+        }
     }
     
     document.getElementById('orderDetailModal').style.display = 'flex';
