@@ -1,3 +1,4 @@
+auth.js
 // auth.js - Authentication Management
 
 function handleLogin(event) {
@@ -13,7 +14,7 @@ function handleLogin(event) {
         sessionStorage.setItem('userRole', 'admin');
         sessionStorage.setItem('userName', 'Administrator');
         sessionStorage.setItem('loginTime', new Date().getTime());
-        window.location.href = '/Josua-/dashboard.html';
+        window.location.href = 'dashboard.html';
         return;
     }
     
@@ -33,9 +34,9 @@ function handleLogin(event) {
         
         // Redirect based on role
         if (staff.role === 'cashier') {
-            window.location.href = '/Josua-/cashier.html';
+            window.location.href = 'cashier.html';
         } else {
-            window.location.href = '/Josua-/waiter.html';
+            window.location.href = 'waiter.html';
         }
         return;
     }
@@ -81,18 +82,18 @@ function logout() {
     sessionStorage.removeItem('userName');
     sessionStorage.removeItem('userId');
     sessionStorage.removeItem('loginTime');
-    window.location.href = '/Josua-/login.html';
+    window.location.href = 'login.html';
 }
 
 function requireAuth() {
     if (!checkAuth()) {
-        window.location.href = '/Josua-/login.html';
+        window.location.href = 'login.html';
     }
 }
 
 function requireRole(allowedRoles) {
     if (!checkAuth()) {
-        window.location.href = '/Josua-/login.html';
+        window.location.href = 'login.html';
         return false;
     }
     
@@ -100,11 +101,11 @@ function requireRole(allowedRoles) {
     if (!allowedRoles.includes(userRole)) {
         alert('Anda tidak memiliki akses ke halaman ini!');
         if (userRole === 'cashier') {
-            window.location.href = '/Josua-/cashier.html';
+            window.location.href = 'cashier.html';
         } else if (userRole === 'waiter') {
-            window.location.href = '/Josua-/waiter.html';
+            window.location.href = 'waiter.html';
         } else {
-            window.location.href = '/Josua-/dashboard.html';
+            window.location.href = 'dashboard.html';
         }
         return false;
     }
