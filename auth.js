@@ -13,7 +13,7 @@ function handleLogin(event) {
         sessionStorage.setItem('userRole', 'admin');
         sessionStorage.setItem('userName', 'Administrator');
         sessionStorage.setItem('loginTime', new Date().getTime());
-        window.location.href = 'dashboard.html';
+        window.location.href = '/Josua-/dashboard.html';
         return;
     }
     
@@ -33,9 +33,9 @@ function handleLogin(event) {
         
         // Redirect based on role
         if (staff.role === 'cashier') {
-            window.location.href = 'cashier.html';
+            window.location.href = '/Josua-/cashier.html';
         } else {
-            window.location.href = 'waiter.html';
+            window.location.href = '/Josua-/waiter.html';
         }
         return;
     }
@@ -81,18 +81,18 @@ function logout() {
     sessionStorage.removeItem('userName');
     sessionStorage.removeItem('userId');
     sessionStorage.removeItem('loginTime');
-    window.location.href = 'login.html';
+    window.location.href = '/Josua-/login.html';
 }
 
 function requireAuth() {
     if (!checkAuth()) {
-        window.location.href = 'login.html';
+        window.location.href = '/Josua-/login.html';
     }
 }
 
 function requireRole(allowedRoles) {
     if (!checkAuth()) {
-        window.location.href = 'login.html';
+        window.location.href = '/Josua-/login.html';
         return false;
     }
     
@@ -100,11 +100,11 @@ function requireRole(allowedRoles) {
     if (!allowedRoles.includes(userRole)) {
         alert('Anda tidak memiliki akses ke halaman ini!');
         if (userRole === 'cashier') {
-            window.location.href = 'cashier.html';
+            window.location.href = '/Josua-/cashier.html';
         } else if (userRole === 'waiter') {
-            window.location.href = 'waiter.html';
+            window.location.href = '/Josua-/waiter.html';
         } else {
-            window.location.href = 'dashboard.html';
+            window.location.href = '/Josua-/dashboard.html';
         }
         return false;
     }
