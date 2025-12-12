@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Restoran Digital</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <h1>🔐 Admin Panel</h1>
+                <p>Restoran Digital</p>
+            </div>
+            
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required placeholder="Masukkan username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="Masukkan password">
+                </div>
+                
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+                
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </form>
+            
+            <div class="login-footer">
+                <p style="margin-bottom: 15px;"><strong>Login Credentials:</strong></p>
+                <div style="text-align: left; background: var(--light-color); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <p style="margin-bottom: 8px;">👤 <strong>Admin:</strong> username: <code>admin</code>, password: <code>admin123</code></p>
+                    <p style="margin-bottom: 8px;">💵 <strong>Kasir:</strong> username: <code>kasir1</code>, password: <code>kasir123</code></p>
+                    <p>🍽️ <strong>Pelayan:</strong> username: <code>pegawai1</code>, password: <code>pegawai123</code></p>
+                </div>
+                <a href="../index.html">← Kembali ke Beranda</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/db.js"></script>
+    <script src="../js/auth.js"></script>
+</body>
+</html>

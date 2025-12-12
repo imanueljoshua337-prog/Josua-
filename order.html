@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesan Sekarang - Restoran Digital</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 id="restaurantName">Restoran Digital</h1>
+            <div class="table-info">
+                <span>🪑 Meja <span id="tableNumber">-</span></span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="order-layout">
+            <!-- Menu Section -->
+            <section class="menu-section">
+                <div class="menu-header">
+                    <h2>Menu</h2>
+                    <div class="category-filter">
+                        <button class="filter-btn active" data-category="all">Semua</button>
+                        <button class="filter-btn" data-category="Makanan">Makanan</button>
+                        <button class="filter-btn" data-category="Minuman">Minuman</button>
+                    </div>
+                </div>
+
+                <div id="menuList" class="menu-grid">
+                    <!-- Menu items will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Cart Section -->
+            <section class="cart-section">
+                <div class="cart-sticky">
+                    <h2>Pesanan Anda</h2>
+                    
+                    <div id="cartItems" class="cart-items">
+                        <div class="empty-cart">
+                            <p>🛒 Keranjang masih kosong</p>
+                        </div>
+                    </div>
+
+                    <div class="cart-summary" id="cartSummary" style="display: none;">
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span id="subtotal">Rp 0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Pajak (<span id="taxPercent">10</span>%):</span>
+                            <span id="tax">Rp 0</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Service (<span id="servicePercent">5</span>%):</span>
+                            <span id="service">Rp 0</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total:</span>
+                            <span id="total">Rp 0</span>
+                        </div>
+                    </div>
+
+                    <div class="cart-actions" id="cartActions" style="display: none;">
+                        <textarea id="orderNotes" placeholder="Catatan tambahan (opsional)..." rows="2"></textarea>
+                        <button class="btn btn-primary btn-block" onclick="placeOrder()">
+                            Pesan Sekarang
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="js/db.js"></script>
+    <script src="js/order.js"></script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Staff - Admin Panel</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🍽️ Admin Panel</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="menu.html" class="nav-item">
+                    <span>🍔</span> Menu
+                </a>
+                <a href="table.html" class="nav-item">
+                    <span>🪑</span> Meja
+                </a>
+                <a href="orders.html" class="nav-item">
+                    <span>📋</span> Pesanan
+                </a>
+                <a href="staff.html" class="nav-item active">
+                    <span>👥</span> Staff
+                </a>
+                <a href="report.html" class="nav-item">
+                    <span>📈</span> Laporan
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span>⚙️</span> Pengaturan
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn btn-danger btn-block">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Kelola Staff / Pegawai</h1>
+                <p>Tambah, edit, atau hapus data staff restoran</p>
+            </div>
+
+            <!-- Staff Statistics -->
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 30px;">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #3498db;">👥</div>
+                    <div class="stat-info">
+                        <h3 id="totalStaff">0</h3>
+                        <p>Total Staff</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #27ae60;">💵</div>
+                    <div class="stat-info">
+                        <h3 id="totalCashiers">0</h3>
+                        <p>Kasir</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #f39c12;">🍽️</div>
+                    <div class="stat-info">
+                        <h3 id="totalWaiters">0</h3>
+                        <p>Pelayan</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Daftar Staff</h2>
+                    <button onclick="showAddStaffForm()" class="btn btn-primary">+ Tambah Staff</button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nama</th>
+                                    <th>Username</th>
+                                    <th>Role</th>
+                                    <th>Telepon</th>
+                                    <th>Tanggal Masuk</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="staffList">
+                                <tr>
+                                    <td colspan="8" class="text-center">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Staff Modal -->
+    <div id="staffModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="staffFormTitle">Tambah Staff</h2>
+                <button onclick="closeModal('staffModal')" class="modal-close">×</button>
+            </div>
+            <form onsubmit="saveStaff(event)" id="staffForm">
+                <div class="modal-body">
+                    <input type="hidden" id="staffId">
+                    
+                    <div class="form-group">
+                        <label for="staffName">Nama Lengkap *</label>
+                        <input type="text" id="staffName" required placeholder="Contoh: Budi Santoso">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="staffUsername">Username *</label>
+                        <input type="text" id="staffUsername" required placeholder="Contoh: kasir1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="staffPassword">Password *</label>
+                        <input type="password" id="staffPassword" required minlength="6" placeholder="Minimal 6 karakter">
+                        <small style="color: var(--gray-color);">Kosongkan jika tidak ingin mengubah password</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="staffRole">Jabatan *</label>
+                        <select id="staffRole" required>
+                            <option value="">Pilih Jabatan</option>
+                            <option value="cashier">Kasir</option>
+                            <option value="waiter">Pelayan</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="staffPhone">Nomor Telepon *</label>
+                        <input type="tel" id="staffPhone" required placeholder="081234567890">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="staffStatus">Status *</label>
+                        <select id="staffStatus" required>
+                            <option value="active">Aktif</option>
+                            <option value="inactive">Tidak Aktif</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="closeModal('staffModal')" class="btn btn-secondary">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/db.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin.js"></script>
+    <script>
+        requireRole(['admin']);
+        loadStaffList();
+        loadStaffStats();
+    </script>
+</body>
+</html>

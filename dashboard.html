@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Admin Panel</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🍽️ Admin Panel</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item active">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="menu.html" class="nav-item">
+                    <span>🍔</span> Menu
+                </a>
+                <a href="table.html" class="nav-item">
+                    <span>🪑</span> Meja
+                </a>
+                <a href="orders.html" class="nav-item">
+                    <span>📋</span> Pesanan
+                </a>
+                <a href="staff.html" class="nav-item">
+                    <span>👥</span> Staff
+                </a>
+                <a href="report.html" class="nav-item">
+                    <span>📈</span> Laporan
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span>⚙️</span> Pengaturan
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn btn-danger btn-block">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Dashboard</h1>
+                <p>Ringkasan sistem restoran digital</p>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #3498db;">📋</div>
+                    <div class="stat-info">
+                        <h3 id="totalOrders">0</h3>
+                        <p>Total Pesanan</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #27ae60;">✓</div>
+                    <div class="stat-info">
+                        <h3 id="completedOrders">0</h3>
+                        <p>Pesanan Selesai</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #f39c12;">⏳</div>
+                    <div class="stat-info">
+                        <h3 id="pendingOrders">0</h3>
+                        <p>Pesanan Pending</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #e74c3c;">💰</div>
+                    <div class="stat-info">
+                        <h3 id="totalRevenue">Rp 0</h3>
+                        <p>Total Pendapatan</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Stats -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>📅 Statistik Hari Ini</h2>
+                </div>
+                <div class="card-body">
+                    <div class="today-stats">
+                        <div class="today-stat-item">
+                            <span class="label">Pesanan Hari Ini:</span>
+                            <span class="value" id="todayOrders">0</span>
+                        </div>
+                        <div class="today-stat-item">
+                            <span class="label">Pendapatan Hari Ini:</span>
+                            <span class="value" id="todayRevenue">Rp 0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>📋 Pesanan Terbaru</h2>
+                    <a href="orders.html" class="btn btn-sm btn-primary">Lihat Semua</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>No. Pesanan</th>
+                                    <th>Meja</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Waktu</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentOrders">
+                                <tr>
+                                    <td colspan="5" class="text-center">Tidak ada pesanan</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/db.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin.js"></script>
+    <script>
+        requireAuth();
+        loadDashboard();
+    </script>
+</body>
+</html>

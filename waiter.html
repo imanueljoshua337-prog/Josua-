@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pelayan - Dashboard</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🍽️ Panel Pelayan</h2>
+                <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 5px;" id="waiterName">Pelayan</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="waiter.html" class="nav-item active">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="waiter-orders.html" class="nav-item">
+                    <span>📋</span> Pesanan Aktif
+                </a>
+                <a href="waiter-tables.html" class="nav-item">
+                    <span>🪑</span> Status Meja
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn btn-danger btn-block">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Dashboard Pelayan</h1>
+                <p>Selamat datang, <span id="welcomeName">Pelayan</span> 👋</p>
+            </div>
+
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #3498db;">📋</div>
+                    <div class="stat-info">
+                        <h3 id="activeOrders">0</h3>
+                        <p>Pesanan Aktif</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #27ae60;">🪑</div>
+                    <div class="stat-info">
+                        <h3 id="availableTables">0</h3>
+                        <p>Meja Tersedia</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #e74c3c;">🔴</div>
+                    <div class="stat-info">
+                        <h3 id="occupiedTables">0</h3>
+                        <p>Meja Terisi</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #f39c12;">⏰</div>
+                    <div class="stat-info">
+                        <h3 id="urgentOrders">0</h3>
+                        <p>Pesanan Urgent</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card" style="margin-bottom: 30px;">
+                <div class="card-header">
+                    <h2>⚡ Akses Cepat</h2>
+                </div>
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <a href="waiter-orders.html" class="quick-action-card" style="text-decoration: none; color: inherit;">
+                            <div style="background: linear-gradient(135deg, #3498DB, #5DADE2); padding: 30px; border-radius: 10px; text-align: center; color: white; transition: transform 0.3s; cursor: pointer;">
+                                <div style="font-size: 3rem; margin-bottom: 10px;">📋</div>
+                                <h3 style="margin: 0; font-size: 1.2rem;">Kelola Pesanan</h3>
+                                <p style="margin-top: 5px; opacity: 0.9; font-size: 0.9rem;">Update status pesanan</p>
+                            </div>
+                        </a>
+                        <a href="waiter-tables.html" class="quick-action-card" style="text-decoration: none; color: inherit;">
+                            <div style="background: linear-gradient(135deg, #27AE60, #2ECC71); padding: 30px; border-radius: 10px; text-align: center; color: white; transition: transform 0.3s; cursor: pointer;">
+                                <div style="font-size: 3rem; margin-bottom: 10px;">🪑</div>
+                                <h3 style="margin: 0; font-size: 1.2rem;">Status Meja</h3>
+                                <p style="margin-top: 5px; opacity: 0.9; font-size: 0.9rem;">Monitor ketersediaan meja</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Summary -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>📊 Ringkasan Hari Ini</h2>
+                </div>
+                <div class="card-body">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                        <div style="background: var(--light-color); padding: 20px; border-radius: 10px;">
+                            <div style="color: var(--gray-color); font-size: 0.9rem; margin-bottom: 8px;">Total Pesanan Hari Ini</div>
+                            <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color);" id="todayOrders">0</div>
+                        </div>
+                        <div style="background: var(--light-color); padding: 20px; border-radius: 10px;">
+                            <div style="color: var(--gray-color); font-size: 0.9rem; margin-bottom: 8px;">Pesanan Selesai</div>
+                            <div style="font-size: 2rem; font-weight: bold; color: #27AE60;" id="todayCompleted">0</div>
+                        </div>
+                        <div style="background: var(--light-color); padding: 20px; border-radius: 10px;">
+                            <div style="color: var(--gray-color); font-size: 0.9rem; margin-bottom: 8px;">Rata-rata Waktu Proses</div>
+                            <div style="font-size: 2rem; font-weight: bold; color: #3498DB;" id="avgTime">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Card -->
+            <div class="card" style="margin-top: 30px;">
+                <div class="card-body">
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        <div style="font-size: 3rem;">💡</div>
+                        <div>
+                            <h3 style="margin-bottom: 8px; color: var(--dark-color);">Tips Pelayan</h3>
+                            <p style="color: var(--gray-color); margin: 0;">Selalu cek pesanan yang sudah lebih dari 15 menit (ditandai merah). Pastikan semua item sudah diantar sebelum menandai pesanan sebagai selesai. Komunikasi yang baik dengan dapur akan memperlancar pelayanan.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/db.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/cashier.js"></script>
+    <script src="../js/waiter.js"></script>
+    <script>
+        requireRole(['waiter', 'admin']);
+        loadWaiterDashboard();
+    </script>
+</body>
+</html>

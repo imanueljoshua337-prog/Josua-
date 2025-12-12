@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Transaksi - Kasir</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>💵 Panel Kasir</h2>
+                <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 5px;" id="cashierName">Kasir</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="cashier.html" class="nav-item">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="cashier-orders.html" class="nav-item">
+                    <span>💰</span> Pembayaran
+                </a>
+                <a href="cashier-history.html" class="nav-item active">
+                    <span>📜</span> Riwayat
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn btn-danger btn-block">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>📜 Riwayat Transaksi</h1>
+                <p>Lihat semua transaksi yang telah diproses</p>
+            </div>
+
+            <!-- Filter Period -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-body" style="padding: 15px;">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                        <span style="font-weight: 600; margin-right: 10px;">Periode:</span>
+                        <button class="filter-btn active" onclick="filterPeriod('today')" data-period="today">
+                            Hari Ini
+                        </button>
+                        <button class="filter-btn" onclick="filterPeriod('week')" data-period="week">
+                            Minggu Ini
+                        </button>
+                        <button class="filter-btn" onclick="filterPeriod('month')" data-period="month">
+                            Bulan Ini
+                        </button>
+                        <button class="filter-btn" onclick="filterPeriod('all')" data-period="all">
+                            Semua
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="stats-grid" style="margin-bottom: 30px;">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #27ae60;">📋</div>
+                    <div class="stat-info">
+                        <h3 id="totalTransactions">0</h3>
+                        <p>Total Transaksi</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #e74c3c;">💰</div>
+                    <div class="stat-info">
+                        <h3 id="totalRevenue">Rp 0</h3>
+                        <p>Total Pendapatan</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #3498db;">💵</div>
+                    <div class="stat-info">
+                        <h3 id="cashTransactions">0</h3>
+                        <p>Transaksi Tunai</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #9b59b6;">💳</div>
+                    <div class="stat-info">
+                        <h3 id="cardTransactions">0</h3>
+                        <p>Transaksi Non-Tunai</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction History Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Daftar Transaksi</h2>
+                    <button onclick="printReport()" class="btn btn-sm btn-secondary">🖨️ Cetak Laporan</button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>No. Pesanan</th>
+                                    <th>Meja</th>
+                                    <th>Total</th>
+                                    <th>Metode</th>
+                                    <th>Kasir</th>
+                                    <th>Waktu</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyList">
+                                <tr>
+                                    <td colspan="7" class="text-center">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Transaction Detail Modal -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detail Transaksi</h2>
+                <button onclick="closeModal('detailModal')" class="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <div style="background: var(--light-color); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd;">
+                        <span>No. Pesanan:</span>
+                        <strong id="detailOrderNumber">-</strong>
+                    </div>
+                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd;">
+                        <span>Meja:</span>
+                        <strong id="detailTable">-</strong>
+                    </div>
+                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd;">
+                        <span>Metode Pembayaran:</span>
+                        <strong id="detailPaymentMethod">-</strong>
+                    </div>
+                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd;">
+                        <span>Waktu Bayar:</span>
+                        <strong id="detailTime">-</strong>
+                    </div>
+                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 10px 0;">
+                        <span>Kasir:</span>
+                        <strong id="detailCashier">-</strong>
+                    </div>
+                </div>
+
+                <h4 style="margin-bottom: 10px;">Item Pesanan:</h4>
+                <div id="detailItems" style="margin-bottom: 20px;">
+                    <!-- Items will be loaded here -->
+                </div>
+
+                <div style="background: var(--light-color); padding: 15px; border-radius: 10px;">
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #ddd;">
+                        <span>Subtotal:</span>
+                        <span id="detailSubtotal">Rp 0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #ddd;">
+                        <span>Pajak:</span>
+                        <span id="detailTax">Rp 0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #ddd;">
+                        <span>Service:</span>
+                        <span id="detailService">Rp 0</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 10px 0; font-size: 1.2rem; font-weight: bold; color: var(--primary-color);">
+                        <span>Total:</span>
+                        <span id="detailTotal">Rp 0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal('detailModal')" class="btn btn-secondary">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/db.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/cashier-history.js"></script>
+    <script>
+        requireRole(['cashier', 'admin']);
+        loadHistoryPage();
+    </script>
+</body>
+</html>

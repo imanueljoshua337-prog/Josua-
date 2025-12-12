@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Menu - Admin Panel</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🍽️ Admin Panel</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="menu.html" class="nav-item active">
+                    <span>🍔</span> Menu
+                </a>
+                <a href="table.html" class="nav-item">
+                    <span>🪑</span> Meja
+                </a>
+                <a href="orders.html" class="nav-item">
+                    <span>📋</span> Pesanan
+                </a>
+                <a href="staff.html" class="nav-item">
+                    <span>👥</span> Staff
+                </a>
+                <a href="report.html" class="nav-item">
+                    <span>📈</span> Laporan
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span>⚙️</span> Pengaturan
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn btn-danger btn-block">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Kelola Menu</h1>
+                <p>Tambah, edit, atau hapus menu restoran</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Daftar Menu</h2>
+                    <button onclick="showAddMenuForm()" class="btn btn-primary">+ Tambah Menu</button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nama Menu</th>
+                                    <th>Kategori</th>
+                                    <th>Harga</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="menuList">
+                                <tr>
+                                    <td colspan="6" class="text-center">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Menu Modal -->
+    <div id="menuModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="menuFormTitle">Tambah Menu</h2>
+                <button onclick="closeModal('menuModal')" class="modal-close">×</button>
+            </div>
+            <form onsubmit="saveMenu(event)" id="menuForm">
+                <div class="modal-body">
+                    <input type="hidden" id="menuId">
+                    
+                    <div class="form-group">
+                        <label for="menuName">Nama Menu *</label>
+                        <input type="text" id="menuName" required placeholder="Contoh: Nasi Goreng Spesial">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="menuCategory">Kategori *</label>
+                        <select id="menuCategory" required>
+                            <option value="">Pilih Kategori</option>
+                            <option value="Makanan">Makanan</option>
+                            <option value="Minuman">Minuman</option>
+                            <option value="Dessert">Dessert</option>
+                            <option value="Snack">Snack</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="menuPrice">Harga *</label>
+                        <input type="number" id="menuPrice" required min="0" placeholder="25000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="menuImage">URL Gambar</label>
+                        <input type="text" id="menuImage" placeholder="assets/images/menu.jpg">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="menuAvailable" checked>
+                            Tersedia
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="closeModal('menuModal')" class="btn btn-secondary">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/db.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin.js"></script>
+    <script>
+        requireAuth();
+        loadMenuList();
+    </script>
+</body>
+</html>

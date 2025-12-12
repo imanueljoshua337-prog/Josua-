@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Pesanan - Admin Panel</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🍽️ Admin Panel</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="menu.html" class="nav-item">
+                    <span>🍔</span> Menu
+                </a>
+                <a href="table.html" class="nav-item">
+                    <span>🪑</span> Meja
+                </a>
+                <a href="orders.html" class="nav-item active">
+                    <span>📋</span> Pesanan
+                </a>
+                <a href="staff.html" class="nav-item">
+                    <span>👥</span> Staff
+                </a>
+                <a href="report.html" class="nav-item">
+                    <span>📈</span> Laporan
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span>⚙️</span> Pengaturan
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn btn-danger btn-block">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Kelola Pesanan</h1>
+                <p>Monitor dan kelola semua pesanan pelanggan</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Daftar Pesanan</h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>No. Pesanan</th>
+                                    <th>Meja</th>
+                                    <th>Item</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersList">
+                                <tr>
+                                    <td colspan="6" class="text-center">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Order Detail Modal -->
+    <div id="orderDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detail Pesanan</h2>
+                <button onclick="closeModal('orderDetailModal')" class="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="order-info" style="background: var(--light-color); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd;">
+                        <span>Nomor Pesanan:</span>
+                        <strong id="detailOrderNumber">-</strong>
+                    </div>
+                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd;">
+                        <span>Meja:</span>
+                        <strong id="detailTableNumber">-</strong>
+                    </div>
+                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd;">
+                        <span>Tanggal:</span>
+                        <strong id="detailOrderDate">-</strong>
+                    </div>
+                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 10px 0;">
+                        <span>Status:</span>
+                        <strong id="detailOrderStatus">-</strong>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom: 15px;">Item Pesanan:</h3>
+                <div id="detailOrderItems" style="margin-bottom: 20px;">
+                    <!-- Items will be loaded here -->
+                </div>
+
+                <div style="background: var(--light-color); padding: 15px; border-radius: 10px;">
+                    <div class="order-item-row">
+                        <span>Subtotal:</span>
+                        <span id="detailSubtotal">Rp 0</span>
+                    </div>
+                    <div class="order-item-row">
+                        <span>Pajak:</span>
+                        <span id="detailTax">Rp 0</span>
+                    </div>
+                    <div class="order-item-row">
+                        <span>Service:</span>
+                        <span id="detailService">Rp 0</span>
+                    </div>
+                    <div class="order-item-row" style="font-weight: bold; font-size: 1.1rem; color: var(--primary-color); padding-top: 10px; border-top: 2px solid #ddd;">
+                        <span>Total:</span>
+                        <span id="detailTotal">Rp 0</span>
+                    </div>
+                </div>
+
+                <div id="detailNotes" style="margin-top: 20px; padding: 15px; background: rgba(255, 107, 53, 0.1); border-radius: 10px; border-left: 4px solid var(--primary-color);">
+                    <strong>Catatan:</strong>
+                    <p id="detailNotesText" style="margin-top: 5px;"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal('orderDetailModal')" class="btn btn-secondary">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/db.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin.js"></script>
+    <script>
+        requireAuth();
+        loadOrdersList();
+    </script>
+</body>
+</html>

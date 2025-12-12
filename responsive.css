@@ -1,0 +1,121 @@
+/* responsive.css - Responsive Stylesheet */
+
+/* Tablet */
+@media screen and (max-width: 992px) {
+    .order-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .cart-section {
+        order: -1;
+    }
+    
+    .cart-sticky {
+        position: relative;
+        top: 0;
+        max-height: none;
+    }
+    
+    .menu-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+    
+    .table-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    
+    .features {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Mobile */
+@media screen and (max-width: 768px) {
+    header h1 {
+        font-size: 1.5rem;
+    }
+    
+    header p {
+        font-size: 0.9rem;
+    }
+    
+    .welcome-box {
+        padding: 30px 20px;
+    }
+    
+    .welcome-box h2 {
+        font-size: 2rem;
+    }
+    
+    .table-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    .menu-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+    }
+    
+    .menu-section,
+    .cart-sticky {
+        padding: 20px;
+    }
+    
+    .category-filter {
+        justify-content: center;
+    }
+    
+    .filter-btn {
+        padding: 6px 15px;
+        font-size: 0.9rem;
+    }
+    
+    .success-box {
+        padding: 30px 20px;
+    }
+    
+    .success-actions {
+        flex-direction: column;
+    }
+    
+    .info-row {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .order-item-row {
+        font-size: 0.9rem;
+    }
+}
+
+/* Small Mobile */
+@media screen and (max-width: 480px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    header h1 {
+        font-size: 1.3rem;
+    }
+    
+    .table-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .menu-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .welcome-box h2 {
+        font-size: 1.5rem;
+    }
+    
+    .feature-item {
+        padding: 20px;
+    }
+    
+    .feature-item .icon {
+        font-size: 2.5rem;
+    }
+}

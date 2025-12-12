@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesanan Aktif - Pelayan</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🍽️ Panel Pelayan</h2>
+                <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 5px;" id="waiterName">Pelayan</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="waiter.html" class="nav-item">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="waiter-orders.html" class="nav-item active">
+                    <span>📋</span> Pesanan Aktif
+                </a>
+                <a href="waiter-tables.html" class="nav-item">
+                    <span>🪑</span> Status Meja
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn btn-danger btn-block">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>📋 Kelola Pesanan Aktif</h1>
+                <p>Monitor dan update status pesanan pelanggan</p>
+            </div>
+
+            <!-- Filter Status -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-body" style="padding: 15px;">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                        <span style="font-weight: 600; margin-right: 10px;">Filter Status:</span>
+                        <button class="filter-btn active" onclick="filterStatus('all')" data-status="all">
+                            Semua (<span id="countAll">0</span>)
+                        </button>
+                        <button class="filter-btn" onclick="filterStatus('pending')" data-status="pending">
+                            Pending (<span id="countPending">0</span>)
+                        </button>
+                        <button class="filter-btn" onclick="filterStatus('processing')" data-status="processing">
+                            Diproses (<span id="countProcessing">0</span>)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Grid -->
+            <div id="ordersGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;">
+                <!-- Orders will be loaded here -->
+            </div>
+
+            <div id="emptyState" style="display: none; text-align: center; padding: 60px 20px; color: var(--gray-color);">
+                <div style="font-size: 4rem; margin-bottom: 20px;">✓</div>
+                <h3>Tidak Ada Pesanan Aktif</h3>
+                <p>Semua pesanan sudah diproses atau belum ada pesanan baru</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Order Detail Modal -->
+    <div id="orderDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detail Pesanan</h2>
+                <button onclick="closeModal('orderDetailModal')" class="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="currentOrderId">
+                
+                <div style="background: var(--light-color); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd;">
+                        <span>No. Pesanan:</span>
+                        <strong id="detailOrderNumber">-</strong>
+                    </div>
+                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd;">
+                        <span>Meja:</span>
+                        <strong id="detailTableNumber">-</strong>
+                    </div>
+                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd;">
+                        <span>Waktu Order:</span>
+                        <strong id="detailTime">-</strong>
+                    </div>
+                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 10px 0;">
+                        <span>Status:</span>
+                        <strong id="detailOrderStatus">-</strong>
+                    </div>
+                </div>
+
+                <h4 style="margin-bottom: 10px;">📝 Item Pesanan:</h4>
+                <div id="detailOrderItems" style="margin-bottom: 20px; max-height: 300px; overflow-y: auto;">
+                    <!-- Items will be loaded here -->
+                </div>
+
+                <div id="detailNotes" style="padding: 15px; background: rgba(255, 107, 53, 0.1); border-radius: 10px; border-left: 4px solid var(--primary-color); display: none; margin-bottom: 20px;">
+                    <strong>💬 Catatan Pelanggan:</strong>
+                    <p id="detailNotesText" style="margin-top: 5px;"></p>
+                </div>
+
+                <div style="background: var(--light-color); padding: 15px; border-radius: 10px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 600;">
+                        <span>Total Pembayaran:</span>
+                        <span style="color: var(--primary-color);" id="detailTotal">Rp 0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal('orderDetailModal')" class="btn btn-secondary">Tutup</button>
+                <button onclick="updateStatus('processing')" class="btn btn-primary" id="btnProcessing" style="display: none;">
+                    ▶️ Mulai Proses
+                </button>
+                <button onclick="updateStatus('completed')" class="btn btn-success" id="btnCompleted" style="display: none;">
+                    ✓ Tandai Selesai
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/db.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/cashier.js"></script>
+    <script src="../js/waiter-orders.js"></script>
+    <script>
+        requireRole(['waiter', 'admin']);
+        loadWaiterOrdersPage();
+    </script>
+</body>
+</html>

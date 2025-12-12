@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan - Admin Panel</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🍽️ Admin Panel</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="menu.html" class="nav-item">
+                    <span>🍔</span> Menu
+                </a>
+                <a href="table.html" class="nav-item">
+                    <span>🪑</span> Meja
+                </a>
+                <a href="orders.html" class="nav-item">
+                    <span>📋</span> Pesanan
+                </a>
+                <a href="staff.html" class="nav-item">
+                    <span>👥</span> Staff
+                </a>
+                <a href="report.html" class="nav-item active">
+                    <span>📈</span> Laporan
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span>⚙️</span> Pengaturan
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn btn-danger btn-block">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Laporan Penjualan</h1>
+                <p>Ringkasan performa restoran</p>
+            </div>
+
+            <!-- Summary Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #3498db;">📋</div>
+                    <div class="stat-info">
+                        <h3 id="reportTotalOrders">0</h3>
+                        <p>Total Pesanan</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #27ae60;">✓</div>
+                    <div class="stat-info">
+                        <h3 id="reportCompletedOrders">0</h3>
+                        <p>Pesanan Selesai</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #e74c3c;">💰</div>
+                    <div class="stat-info">
+                        <h3 id="reportTotalRevenue">Rp 0</h3>
+                        <p>Total Pendapatan</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #f39c12;">📅</div>
+                    <div class="stat-info">
+                        <h3 id="reportTodayRevenue">Rp 0</h3>
+                        <p>Pendapatan Hari Ini</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Best Selling Items -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>🏆 Menu Terlaris</h2>
+                </div>
+                <div class="card-body">
+                    <div id="bestSellingItems">
+                        <!-- Best selling items will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue Information -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>💵 Informasi Pendapatan</h2>
+                </div>
+                <div class="card-body">
+                    <p style="margin-bottom: 20px;">Laporan ini menampilkan total pendapatan dari semua pesanan yang telah diselesaikan (status: completed). Data diperbarui secara real-time sesuai dengan pesanan yang masuk.</p>
+                    
+                    <div style="background: var(--light-color); padding: 20px; border-radius: 10px;">
+                        <h3 style="margin-bottom: 15px; color: var(--dark-color);">Catatan:</h3>
+                        <ul style="list-style-position: inside; color: var(--gray-color);">
+                            <li>Pendapatan dihitung dari pesanan dengan status "Selesai"</li>
+                            <li>Termasuk pajak dan biaya layanan</li>
+                            <li>Data dapat di-reset melalui menu Pengaturan</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/db.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin.js"></script>
+    <script>
+        requireAuth();
+        loadReports();
+    </script>
+</body>
+</html>

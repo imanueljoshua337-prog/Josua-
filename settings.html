@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan - Admin Panel</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🍽️ Admin Panel</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="menu.html" class="nav-item">
+                    <span>🍔</span> Menu
+                </a>
+                <a href="table.html" class="nav-item">
+                    <span>🪑</span> Meja
+                </a>
+                <a href="orders.html" class="nav-item">
+                    <span>📋</span> Pesanan
+                </a>
+                <a href="staff.html" class="nav-item">
+                    <span>👥</span> Staff
+                </a>
+                <a href="report.html" class="nav-item">
+                    <span>📈</span> Laporan
+                </a>
+                <a href="settings.html" class="nav-item active">
+                    <span>⚙️</span> Pengaturan
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn btn-danger btn-block">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Pengaturan</h1>
+                <p>Kelola pengaturan sistem restoran</p>
+            </div>
+
+            <!-- Restaurant Settings -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>🏪 Pengaturan Restoran</h2>
+                </div>
+                <div class="card-body">
+                    <form onsubmit="saveSettings(event)" id="settingsForm">
+                        <div class="form-group">
+                            <label for="restaurantName">Nama Restoran *</label>
+                            <input type="text" id="restaurantName" required placeholder="Restoran Digital">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="taxPercent">Pajak (%) *</label>
+                            <input type="number" id="taxPercent" required min="0" max="100" step="0.1" placeholder="10">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="servicePercent">Biaya Layanan (%) *</label>
+                            <input type="number" id="servicePercent" required min="0" max="100" step="0.1" placeholder="5">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Simpan Pengaturan</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Admin Account -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>🔐 Akun Admin</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Username Saat Ini:</label>
+                        <input type="text" id="adminUsername" disabled style="background: var(--light-color);">
+                    </div>
+                    
+                    <h3 style="margin-top: 30px; margin-bottom: 15px; color: var(--dark-color);">Ganti Password</h3>
+                    <form onsubmit="changePassword(event)" id="passwordForm">
+                        <div class="form-group">
+                            <label for="currentPassword">Password Lama *</label>
+                            <input type="password" id="currentPassword" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="newPassword">Password Baru *</label>
+                            <input type="password" id="newPassword" required minlength="6">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirmPassword">Konfirmasi Password Baru *</label>
+                            <input type="password" id="confirmPassword" required minlength="6">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Ganti Password</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Data Management -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>🗄️ Manajemen Data</h2>
+                </div>
+                <div class="card-body">
+                    <div style="background: rgba(231, 76, 60, 0.1); padding: 20px; border-radius: 10px; border-left: 4px solid var(--danger-color); margin-bottom: 20px;">
+                        <h3 style="color: var(--danger-color); margin-bottom: 10px;">⚠️ Zona Bahaya</h3>
+                        <p style="color: var(--gray-color); margin-bottom: 15px;">Tindakan berikut tidak dapat dibatalkan. Harap berhati-hati!</p>
+                        
+                        <button onclick="resetData()" class="btn btn-danger">Reset Semua Data</button>
+                    </div>
+                    
+                    <div style="background: var(--light-color); padding: 20px; border-radius: 10px;">
+                        <h3 style="margin-bottom: 10px; color: var(--dark-color);">Informasi Penyimpanan</h3>
+                        <p style="color: var(--gray-color);">Sistem menggunakan localStorage browser untuk menyimpan data. Data akan tetap tersimpan meskipun browser ditutup, namun dapat hilang jika cache browser dibersihkan.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/db.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin.js"></script>
+    <script>
+        requireAuth();
+        loadSettings();
+        
+        function resetData() {
+            if (confirm('Apakah Anda yakin ingin menghapus SEMUA data? Tindakan ini tidak dapat dibatalkan!')) {
+                if (confirm('Konfirmasi sekali lagi. Semua menu, meja, pesanan, dan laporan akan dihapus!')) {
+                    localStorage.clear();
+                    alert('Semua data telah dihapus! Halaman akan dimuat ulang.');
+                    window.location.reload();
+                }
+            }
+        }
+    </script>
+</body>
+</html>

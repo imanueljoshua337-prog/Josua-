@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restoran Digital - Selamat Datang</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 id="restaurantName">Restoran Digital</h1>
+            <p>Pesan makanan dengan mudah & cepat</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="welcome-section">
+            <div class="welcome-box">
+                <h2>Selamat Datang!</h2>
+                <p>Silakan pilih meja Anda untuk mulai memesan</p>
+                
+                <div class="table-selection">
+                    <h3>Pilih Meja:</h3>
+                    <div id="tableList" class="table-grid">
+                        <!-- Tables will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="or-divider">
+                    <span>ATAU</span>
+                </div>
+
+                <div class="qr-section">
+                    <h3>Scan QR Code di Meja Anda</h3>
+                    <p>Setiap meja memiliki QR Code unik untuk mempermudah pemesanan</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="feature-item">
+                <div class="icon">📱</div>
+                <h3>Pesan Digital</h3>
+                <p>Pesan langsung dari smartphone Anda</p>
+            </div>
+            <div class="feature-item">
+                <div class="icon">⚡</div>
+                <h3>Proses Cepat</h3>
+                <p>Pesanan langsung masuk ke dapur</p>
+            </div>
+            <div class="feature-item">
+                <div class="icon">💳</div>
+                <h3>Pembayaran Mudah</h3>
+                <p>Berbagai metode pembayaran tersedia</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Restoran Digital. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="admin/login.html" style="color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.9rem;">
+                    🔐 Admin Login
+                </a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="js/db.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

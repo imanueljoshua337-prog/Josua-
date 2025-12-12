@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status Meja - Pelayan</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🍽️ Panel Pelayan</h2>
+                <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 5px;" id="waiterName">Pelayan</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="waiter.html" class="nav-item">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="waiter-orders.html" class="nav-item">
+                    <span>📋</span> Pesanan Aktif
+                </a>
+                <a href="waiter-tables.html" class="nav-item active">
+                    <span>🪑</span> Status Meja
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn btn-danger btn-block">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>🪑 Status Meja</h1>
+                <p>Monitor ketersediaan dan penggunaan meja</p>
+            </div>
+
+            <!-- Table Stats -->
+            <div class="stats-grid" style="margin-bottom: 30px;">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #2C3E50;">🪑</div>
+                    <div class="stat-info">
+                        <h3 id="totalTables">0</h3>
+                        <p>Total Meja</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #27ae60;">✓</div>
+                    <div class="stat-info">
+                        <h3 id="availableTables">0</h3>
+                        <p>Meja Tersedia</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #e74c3c;">✗</div>
+                    <div class="stat-info">
+                        <h3 id="occupiedTables">0</h3>
+                        <p>Meja Terisi</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #f39c12;">⏰</div>
+                    <div class="stat-info">
+                        <h3 id="reservedTables">0</h3>
+                        <p>Meja Dipesan</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-body" style="padding: 15px;">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                        <span style="font-weight: 600; margin-right: 10px;">Filter:</span>
+                        <button class="filter-btn active" onclick="filterTables('all')" data-table-filter="all">
+                            Semua Meja
+                        </button>
+                        <button class="filter-btn" onclick="filterTables('available')" data-table-filter="available">
+                            Tersedia
+                        </button>
+                        <button class="filter-btn" onclick="filterTables('occupied')" data-table-filter="occupied">
+                            Terisi
+                        </button>
+                        <button class="filter-btn" onclick="filterTables('reserved')" data-table-filter="reserved">
+                            Dipesan
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tables Grid -->
+            <div id="tablesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+                <!-- Tables will be loaded here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Table Detail Modal -->
+    <div id="tableDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detail Meja</h2>
+                <button onclick="closeModal('tableDetailModal')" class="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="currentTableId">
+                
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="font-size: 5rem; margin-bottom: 15px;">🪑</div>
+                    <h2 style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 10px;" id="modalTableNumber">Meja 0</h2>
+                    <div id="modalTableStatus" style="display: inline-block; padding: 8px 20px; border-radius: 20px; font-weight: 600; font-size: 1.1rem;"></div>
+                </div>
+
+                <div style="background: var(--light-color); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd;">
+                        <span>Kapasitas:</span>
+                        <strong id="modalTableCapacity">0 orang</strong>
+                    </div>
+                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 10px 0;">
+                        <span>Status:</span>
+                        <strong id="modalTableStatusText">-</strong>
+                    </div>
+                </div>
+
+                <!-- Active Order Info -->
+                <div id="activeOrderInfo" style="display: none;">
+                    <h4 style="margin-bottom: 15px; color: var(--dark-color);">📋 Pesanan Aktif:</h4>
+                    <div style="background: rgba(52, 152, 219, 0.1); padding: 20px; border-radius: 10px; border-left: 4px solid #3498DB;">
+                        <div style="margin-bottom: 10px;">
+                            <strong>No. Pesanan:</strong> <span id="orderNumber">-</span>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <strong>Total:</strong> <span id="orderTotal" style="color: var(--primary-color); font-size: 1.2rem; font-weight: bold;">Rp 0</span>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <strong>Status:</strong> <span id="orderStatus">-</span>
+                        </div>
+                        <button onclick="viewOrderFromTable()" class="btn btn-primary btn-block">
+                            👁️ Lihat Detail Pesanan
+                        </button>
+                    </div>
+                </div>
+
+                <div id="noOrderInfo" style="display: none; text-align: center; padding: 30px; color: var(--gray-color);">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">✓</div>
+                    <p>Tidak ada pesanan aktif di meja ini</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal('tableDetailModal')" class="btn btn-secondary">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/db.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/waiter-tables.js"></script>
+    <script>
+        requireRole(['waiter', 'admin']);
+        loadTableStatusPage();
+    </script>
+</body>
+</html>

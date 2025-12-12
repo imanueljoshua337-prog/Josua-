@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembayaran - Kasir</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>💵 Panel Kasir</h2>
+                <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 5px;" id="cashierName">Kasir</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="cashier.html" class="nav-item">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="cashier-orders.html" class="nav-item active">
+                    <span>💰</span> Pembayaran
+                </a>
+                <a href="cashier-history.html" class="nav-item">
+                    <span>📜</span> Riwayat
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn btn-danger btn-block">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>💰 Proses Pembayaran</h1>
+                <p>Kelola pembayaran pesanan pelanggan</p>
+            </div>
+
+            <!-- Filter Status -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-body" style="padding: 15px;">
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                        <span style="font-weight: 600; margin-right: 10px;">Filter Status:</span>
+                        <button class="filter-btn active" onclick="filterOrders('all')" data-filter="all">
+                            Semua (<span id="countAll">0</span>)
+                        </button>
+                        <button class="filter-btn" onclick="filterOrders('pending')" data-filter="pending">
+                            Pending (<span id="countPending">0</span>)
+                        </button>
+                        <button class="filter-btn" onclick="filterOrders('processing')" data-filter="processing">
+                            Diproses (<span id="countProcessing">0</span>)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Grid -->
+            <div id="ordersGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px;">
+                <!-- Orders will be loaded here -->
+            </div>
+
+            <div id="emptyState" style="display: none; text-align: center; padding: 60px 20px; color: var(--gray-color);">
+                <div style="font-size: 4rem; margin-bottom: 20px;">📋</div>
+                <h3>Tidak Ada Pesanan</h3>
+                <p>Semua pesanan sudah dibayar atau belum ada pesanan baru</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Proses Pembayaran</h2>
+                <button onclick="closeModal('paymentModal')" class="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="paymentOrderId">
+                
+                <!-- Order Summary -->
+                <div style="background: var(--light-color); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd;">
+                        <span>No. Pesanan:</span>
+                        <strong id="paymentOrderNumber">-</strong>
+                    </div>
+                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #ddd;">
+                        <span>Meja:</span>
+                        <strong id="paymentTable">-</strong>
+                    </div>
+                    <div class="info-row" style="display: flex; justify-content: space-between; padding: 10px 0;">
+                        <span style="font-size: 1.2rem; font-weight: bold;">Total:</span>
+                        <strong style="font-size: 1.5rem; color: var(--primary-color);" id="paymentTotal">Rp 0</strong>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div style="margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 10px;">Item Pesanan:</h4>
+                    <div id="paymentItems" style="max-height: 200px; overflow-y: auto;">
+                        <!-- Items will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="form-group">
+                    <label for="paymentMethod">Metode Pembayaran *</label>
+                    <select id="paymentMethod" required>
+                        <option value="">Pilih Metode</option>
+                        <option value="cash">💵 Tunai</option>
+                        <option value="debit">💳 Kartu Debit</option>
+                        <option value="credit">💳 Kartu Kredit</option>
+                        <option value="qris">📱 QRIS</option>
+                        <option value="ewallet">📲 E-Wallet (GoPay, OVO, Dana, dll)</option>
+                    </select>
+                </div>
+
+                <!-- Cash Payment Details -->
+                <div class="form-group" id="cashPaymentDiv" style="display: none;">
+                    <label for="cashReceived">Uang Diterima *</label>
+                    <input type="number" id="cashReceived" min="0" placeholder="0" style="font-size: 1.2rem; font-weight: 600;">
+                    <div style="margin-top: 15px; padding: 15px; background: rgba(39, 174, 96, 0.1); border-radius: 8px; border-left: 4px solid var(--success-color);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 600;">Kembalian:</span>
+                            <span style="font-size: 1.5rem; font-weight: bold; color: var(--success-color);" id="changeAmount">Rp 0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="closeModal('paymentModal')" class="btn btn-secondary">Batal</button>
+                <button type="button" onclick="processPayment()" class="btn btn-success" style="font-size: 1.1rem; padding: 12px 30px;">
+                    ✓ Konfirmasi Pembayaran
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/db.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/cashier.js"></script>
+    <script src="../js/cashier-orders.js"></script>
+    <script>
+        requireRole(['cashier', 'admin']);
+        loadCashierOrdersPage();
+    </script>
+</body>
+</html>

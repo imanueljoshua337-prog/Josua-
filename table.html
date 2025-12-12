@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Meja - Admin Panel</title>
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>🍽️ Admin Panel</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="menu.html" class="nav-item">
+                    <span>🍔</span> Menu
+                </a>
+                <a href="table.html" class="nav-item active">
+                    <span>🪑</span> Meja
+                </a>
+                <a href="orders.html" class="nav-item">
+                    <span>📋</span> Pesanan
+                </a>
+                <a href="staff.html" class="nav-item">
+                    <span>👥</span> Staff
+                </a>
+                <a href="report.html" class="nav-item">
+                    <span>📈</span> Laporan
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <span>⚙️</span> Pengaturan
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn btn-danger btn-block">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Kelola Meja</h1>
+                <p>Tambah, edit, atau hapus meja restoran</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Daftar Meja</h2>
+                    <button onclick="showAddTableForm()" class="btn btn-primary">+ Tambah Meja</button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nomor Meja</th>
+                                    <th>Kapasitas</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableList">
+                                <tr>
+                                    <td colspan="5" class="text-center">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Table Modal -->
+    <div id="tableModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="tableFormTitle">Tambah Meja</h2>
+                <button onclick="closeModal('tableModal')" class="modal-close">×</button>
+            </div>
+            <form onsubmit="saveTable(event)" id="tableForm">
+                <div class="modal-body">
+                    <input type="hidden" id="tableId">
+                    
+                    <div class="form-group">
+                        <label for="tableNumber">Nomor Meja *</label>
+                        <input type="number" id="tableNumber" required min="1" placeholder="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tableCapacity">Kapasitas (Orang) *</label>
+                        <input type="number" id="tableCapacity" required min="1" placeholder="4">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tableStatus">Status *</label>
+                        <select id="tableStatus" required>
+                            <option value="available">Tersedia</option>
+                            <option value="occupied">Terisi</option>
+                            <option value="reserved">Dipesan</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="closeModal('tableModal')" class="btn btn-secondary">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/db.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/admin.js"></script>
+    <script>
+        requireAuth();
+        loadTableList();
+    </script>
+</body>
+</html>
