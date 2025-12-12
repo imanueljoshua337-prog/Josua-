@@ -239,11 +239,19 @@ function viewOrder(id) {
     document.getElementById('detailService').textContent = formatCurrency(order.service);
     document.getElementById('detailTotal').textContent = formatCurrency(order.total);
     
-    if (order.notes) {
-        document.getElementById('detailNotes').textContent = order.notes;
-        document.getElementById('detailNotes').parentElement.style.display = 'block';
-    } else {
-        document.getElementById('detailNotes').parentElement.style.display = 'none';
+    // Handle notes - check if element exists and if notes exist
+    const notesElement = document.getElementById('detailNotes');
+    const notesTextElement = document.getElementById('detailNotesText');
+    
+    if (notesElement) {
+        if (order.notes && order.notes.trim() !== '') {
+            if (notesTextElement) {
+                notesTextElement.textContent = order.notes;
+            }
+            notesElement.style.display = 'block';
+        } else {
+            notesElement.style.display = 'none';
+        }
     }
     
     modal.style.display = 'flex';
