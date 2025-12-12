@@ -5,13 +5,13 @@ const DB = {
     init() {
         if (!localStorage.getItem('menus')) {
             const defaultMenus = [
-                { id: 1, name: 'Nasi Goreng Spesial', price: 25000, category: 'Makanan', image: 'assets/images/nasi-goreng.jpg', available: true },
-                { id: 2, name: 'Mie Goreng', price: 20000, category: 'Makanan', image: 'assets/images/mie-goreng.jpg', available: true },
+                { id: 1, name: 'Nasi Goreng Spesial', price: 25000, category: 'Makanan', image: 'assets/images/nasigoreng.jpg', available: true },
+                { id: 2, name: 'Mie Goreng', price: 20000, category: 'Makanan', image: 'assets/images/miegoreng.jpg', available: true },
                 { id: 3, name: 'Ayam Geprek', price: 22000, category: 'Makanan', image: 'assets/images/ayam-geprek.jpg', available: true },
-                { id: 4, name: 'Sate Ayam', price: 30000, category: 'Makanan', image: 'assets/images/sate.jpg', available: true },
-                { id: 5, name: 'Es Teh Manis', price: 5000, category: 'Minuman', image: 'assets/images/es-teh.jpg', available: true },
-                { id: 6, name: 'Es Jeruk', price: 7000, category: 'Minuman', image: 'assets/images/es-jeruk.jpg', available: true },
-                { id: 7, name: 'Jus Alpukat', price: 12000, category: 'Minuman', image: 'assets/images/jus-alpukat.jpg', available: true }
+                { id: 4, name: 'Sate Ayam', price: 30000, category: 'Makanan', image: 'assets/images/sateayam.jpg', available: true },
+                { id: 5, name: 'Es Teh Manis', price: 5000, category: 'Minuman', image: 'assets/images/tehmanis.jpg', available: true },
+                { id: 6, name: 'Es Jeruk', price: 7000, category: 'Minuman', image: 'assets/images/esjeruk.jpg', available: true },
+                { id: 7, name: 'Jus Alpukat', price: 12000, category: 'Minuman', image: 'assets/images/juspokat.jpg', available: true }
             ];
             localStorage.setItem('menus', JSON.stringify(defaultMenus));
         }
@@ -235,4 +235,5 @@ const DB = {
 };
 
 // Inisialisasi database saat halaman dimuat
+
 DB.init();
