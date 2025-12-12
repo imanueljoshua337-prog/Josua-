@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kasir - Dashboard</title>
-    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
     <div class="admin-layout">
@@ -140,12 +140,13 @@
         </main>
     </div>
 
-    <script src="../js/db.js"></script>
-    <script src="../js/auth.js"></script>
-    <script src="../js/cashier.js"></script>
+    <script src="db.js"></script>
+    <script src="auth.js"></script>
+    <script src="cashier.js"></script>
     <script>
         requireRole(['cashier', 'admin']);
         loadCashierDashboard();
     </script>
 </body>
+
 </html>
