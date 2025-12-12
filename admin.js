@@ -186,17 +186,49 @@ function deleteTable(id) {
 }
 
 // Orders Management Functions
+let currentOrderFilter = 'active';
+
 function loadOrdersList() {
     const orders = DB.getOrders().reverse();
     const tbody = document.getElementById('ordersList');
     
-    if (orders.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada pesanan</td></tr>';
+    // Update counts
+    const activeOrders = orders.filter(o => o.status === 'pending' || o.status === 'processing');
+    const completedOrders = orders.filter(o => o.status === 'completed');
+    
+    if (document.getElementById('countActive')) {
+        document.getElementById('countActive').textContent = activeOrders.length;
+    }
+    if (document.getElementById('countCompleted')) {
+        document.getElementById('countCompleted').textContent = completedOrders.length;
+    }
+    if (document.getElementById('countAll')) {
+        document.getElementById('countAll').textContent = orders.length;
+    }
+    
+    // Filter based on current filter
+    let filtered;
+    if (currentOrderFilter === 'active') {
+        filtered = activeOrders;
+    } else if (currentOrderFilter === 'completed') {
+        filtered = completedOrders;
+    } else {
+        filtered = orders;
+    }
+    
+    if (filtered.length === 0) {
+        let emptyMessage = 'Tidak ada pesanan';
+        if (currentOrderFilter === 'active') {
+            emptyMessage = 'Tidak ada pesanan aktif';
+        } else if (currentOrderFilter === 'completed') {
+            emptyMessage = 'Belum ada pesanan selesai';
+        }
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center">${emptyMessage}</td></tr>`;
         return;
     }
     
     tbody.innerHTML = '';
-    orders.forEach(order => {
+    filtered.forEach(order => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${order.orderNumber}</td>
@@ -204,13 +236,27 @@ function loadOrdersList() {
             <td>${order.items.length} item</td>
             <td>${formatCurrency(order.total)}</td>
             <td><span class="status-badge status-${order.status}">${getStatusText(order.status)}</span></td>
+            <td>${formatDateTime(order.createdAt)}</td>
             <td>
                 <button onclick="viewOrder(${order.id})" class="btn btn-sm btn-primary">Detail</button>
-                ${order.status === 'pending' ? `<button onclick="updateOrderStatus(${order.id}, 'completed')" class="btn btn-sm btn-success">Selesai</button>` : ''}
+                ${order.status === 'pending' ? `<button onclick="updateOrderStatus(${order.id}, 'processing')" class="btn btn-sm btn-success">Proses</button>` : ''}
+                ${order.status === 'processing' ? `<button onclick="updateOrderStatus(${order.id}, 'completed')" class="btn btn-sm btn-success">Selesai</button>` : ''}
             </td>
         `;
         tbody.appendChild(tr);
     });
+}
+
+function filterOrderStatus(status) {
+    currentOrderFilter = status;
+    
+    // Update active tab
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`[data-tab="${status}"]`).classList.add('active');
+    
+    loadOrdersList();
 }
 
 function viewOrder(id) {
