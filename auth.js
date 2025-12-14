@@ -8,15 +8,17 @@ async function handleLogin(event) {
     
     try {
         // Check admin login
-        const admin = await FirebaseDB.getAdmin();
-        if (username === admin.username && password === admin.password) {
-            sessionStorage.setItem('userLoggedIn', 'true');
-            sessionStorage.setItem('userRole', 'admin');
-            sessionStorage.setItem('userName', 'Administrator');
-            sessionStorage.setItem('loginTime', new Date().getTime());
-            window.location.href = 'dashboard.html';
-            return;
-        }
+const admin = await FirebaseDB.getAdmin();
+
+if (admin && username === admin.username && password === admin.password) {
+    sessionStorage.setItem('userLoggedIn', 'true');
+    sessionStorage.setItem('userRole', 'admin');
+    sessionStorage.setItem('userName', 'Administrator');
+    sessionStorage.setItem('loginTime', new Date().getTime());
+    window.location.href = 'dashboard.html';
+    return;
+}
+
         
         // Check staff login
         const staff = await FirebaseDB.getStaffByUsername(username);
@@ -124,3 +126,4 @@ function getUserInfo() {
         id: sessionStorage.getItem('userId')
     };
 }
+
