@@ -1,53 +1,46 @@
-// auth-firebase.js - Authentication Management with Firebase
+// auth.js - Authentication Management
 
-async function handleLogin(event) {
+function handleLogin(event) {
     event.preventDefault();
     
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
+    const admin = DB.getAdmin();
     
-    try {
-        // Check admin login
-const admin = await FirebaseDB.getAdmin();
-
-if (admin && username === admin.username && password === admin.password) {
-    sessionStorage.setItem('userLoggedIn', 'true');
-    sessionStorage.setItem('userRole', 'admin');
-    sessionStorage.setItem('userName', 'Administrator');
-    sessionStorage.setItem('loginTime', new Date().getTime());
-    window.location.href = 'dashboard.html';
-    return;
-}
-
-        
-        // Check staff login
-        const staff = await FirebaseDB.getStaffByUsername(username);
-        if (staff && staff.password === password) {
-            if (staff.status !== 'active') {
-                showError('Akun Anda tidak aktif. Hubungi administrator!');
-                return;
-            }
-            
-            sessionStorage.setItem('userLoggedIn', 'true');
-            sessionStorage.setItem('userRole', staff.role);
-            sessionStorage.setItem('userName', staff.name);
-            sessionStorage.setItem('userId', staff.id);
-            sessionStorage.setItem('loginTime', new Date().getTime());
-            
-            // Redirect based on role
-            if (staff.role === 'cashier') {
-                window.location.href = 'cashier.html';
-            } else {
-                window.location.href = 'waiter.html';
-            }
+    // Check admin login
+    if (username === admin.username && password === admin.password) {
+        sessionStorage.setItem('userLoggedIn', 'true');
+        sessionStorage.setItem('userRole', 'admin');
+        sessionStorage.setItem('userName', 'Administrator');
+        sessionStorage.setItem('loginTime', new Date().getTime());
+        window.location.href = 'dashboard.html';
+        return;
+    }
+    
+    // Check staff login
+    const staff = DB.getStaffByUsername(username);
+    if (staff && staff.password === password) {
+        if (staff.status !== 'active') {
+            showError('Akun Anda tidak aktif. Hubungi administrator!');
             return;
         }
         
-        showError('Username atau password salah!');
-    } catch (error) {
-        console.error('Login error:', error);
-        showError('Terjadi kesalahan saat login. Coba lagi.');
+        sessionStorage.setItem('userLoggedIn', 'true');
+        sessionStorage.setItem('userRole', staff.role);
+        sessionStorage.setItem('userName', staff.name);
+        sessionStorage.setItem('userId', staff.id);
+        sessionStorage.setItem('loginTime', new Date().getTime());
+        
+        // Redirect based on role
+        if (staff.role === 'cashier') {
+            window.location.href = 'cashier.html';
+        } else {
+            window.location.href = 'waiter.html';
+        }
+        return;
     }
+    
+    showError('Username atau password salah!');
 }
 
 function showError(message) {
@@ -126,4 +119,3 @@ function getUserInfo() {
         id: sessionStorage.getItem('userId')
     };
 }
-
