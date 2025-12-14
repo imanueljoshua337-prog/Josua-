@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restoran Digital - Selamat Datang</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 id="restaurantName">Restoran Digital</h1>
+            <p>Pesan makanan dengan mudah & cepat</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="welcome-section">
+            <div class="welcome-box">
+                <h2>Selamat Datang!</h2>
+                <p>Silakan pilih meja Anda untuk mulai memesan</p>
+                
+                <div class="table-selection">
+                    <h3>Pilih Meja:</h3>
+                    <div id="tableList" class="table-grid">
+                        <div style="text-align: center; padding: 40px; color: var(--gray-color);">
+                            <div style="font-size: 2rem; margin-bottom: 10px;">⏳</div>
+                            <p>Memuat data meja...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="or-divider">
+                    <span>ATAU</span>
+                </div>
+
+                <div class="qr-section">
+                    <h3>Scan QR Code di Meja Anda</h3>
+                    <p>Setiap meja memiliki QR Code unik untuk mempermudah pemesanan</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="feature-item">
+                <div class="icon">📱</div>
+                <h3>Pesan Digital</h3>
+                <p>Pesan langsung dari smartphone Anda</p>
+            </div>
+            <div class="feature-item">
+                <div class="icon">⚡</div>
+                <h3>Proses Cepat</h3>
+                <p>Pesanan langsung masuk ke dapur</p>
+            </div>
+            <div class="feature-item">
+                <div class="icon">💳</div>
+                <h3>Pembayaran Mudah</h3>
+                <p>Berbagai metode pembayaran tersedia</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Restoran Digital. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="admin/login.html" style="color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.9rem;">
+                    🔐 Admin Login
+                </a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    
+    <!-- Firebase Config & DB -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-db.js"></script>
+    
+    <!-- Main Script with Firebase -->
+    <script>
+        // Load restaurant name with realtime listener
+        FirebaseDB.listenSettings(settings => {
+            if (settings) {
+                document.getElementById('restaurantName').textContent = settings.restaurantName;
+            }
+        });
+
+        // Load tables with realtime listener
+        FirebaseDB.listenTables(tables => {
+            const tableList = document.getElementById('tableList');
+            
+            if (tables.length === 0) {
+                tableList.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--gray-color);"><p>Tidak ada meja tersedia</p></div>';
+                return;
+            }
+            
+            tableList.innerHTML = '';
+            
+            tables.forEach(table => {
+                const tableCard = document.createElement('div');
+                tableCard.className = `table-card ${table.status}`;
+                
+                tableCard.innerHTML = `
+                    <div class="table-number">Meja ${table.number}</div>
+                    <div class="table-capacity">
+                        <span class="icon">👥</span>
+                        ${table.capacity} orang
+                    </div>
+                    <div class="table-status">${getStatusText(table.status)}</div>
+                `;
+                
+                if (table.status === 'available') {
+                    tableCard.style.cursor = 'pointer';
+                    tableCard.onclick = () => selectTable(table.id, table.number);
+                }
+                
+                tableList.appendChild(tableCard);
+            });
+        });
+
+        function getStatusText(status) {
+            const statusMap = {
+                'available': '✓ Tersedia',
+                'occupied': '✗ Terisi',
+                'reserved': '⏰ Dipesan'
+            };
+            return statusMap[status] || status;
+        }
+
+        function selectTable(tableId, tableNumber) {
+            sessionStorage.setItem('selectedTable', tableId);
+            sessionStorage.setItem('selectedTableNumber', tableNumber);
+            window.location.href = 'order-firebase.html';
+        }
+    </script>
+</body>
+</html>
