@@ -271,4 +271,8 @@ const FirebaseDB = {
 const DB = FirebaseDB;
 
 // Initialize on load
-FirebaseDB.init();
+window.addEventListener('load', () => {
+    FirebaseDB.init();
+});
+
+
