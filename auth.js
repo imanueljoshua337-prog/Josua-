@@ -1,38 +1,44 @@
-// auth-firebase.js - Authentication Management with Firebase
+// auth.js - FIXED Authentication Management
 
 async function handleLogin(event) {
     event.preventDefault();
-    
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+
     try {
-        // Check admin login
-        const admin = await FirebaseDB.getAdmin();
-        if (username === admin.username && password === admin.password) {
+        // =====================
+        // ✅ ADMIN LOGIN (FIX)
+        // =====================
+        const admin = await DB.getAdmin();
+
+        if (admin && username === admin.username && password === admin.password) {
             sessionStorage.setItem('userLoggedIn', 'true');
             sessionStorage.setItem('userRole', 'admin');
             sessionStorage.setItem('userName', 'Administrator');
-            sessionStorage.setItem('loginTime', new Date().getTime());
+            sessionStorage.setItem('loginTime', Date.now());
+
             window.location.href = 'dashboard.html';
             return;
         }
-        
-        // Check staff login
-        const staff = await FirebaseDB.getStaffByUsername(username);
+
+        // =====================
+        // ✅ STAFF LOGIN
+        // =====================
+        const staff = await DB.getStaffByUsername(username);
+
         if (staff && staff.password === password) {
             if (staff.status !== 'active') {
                 showError('Akun Anda tidak aktif. Hubungi administrator!');
                 return;
             }
-            
+
             sessionStorage.setItem('userLoggedIn', 'true');
             sessionStorage.setItem('userRole', staff.role);
             sessionStorage.setItem('userName', staff.name);
             sessionStorage.setItem('userId', staff.id);
-            sessionStorage.setItem('loginTime', new Date().getTime());
-            
-            // Redirect based on role
+            sessionStorage.setItem('loginTime', Date.now());
+
             if (staff.role === 'cashier') {
                 window.location.href = 'cashier.html';
             } else {
@@ -40,52 +46,54 @@ async function handleLogin(event) {
             }
             return;
         }
-        
+
         showError('Username atau password salah!');
     } catch (error) {
         console.error('Login error:', error);
-        showError('Terjadi kesalahan saat login. Coba lagi.');
+        showError('Terjadi kesalahan saat login.');
     }
 }
 
+// =====================
+// UI ERROR
+// =====================
 function showError(message) {
     const errorDiv = document.getElementById('errorMessage');
     errorDiv.textContent = message;
     errorDiv.style.display = 'block';
-    
+
     setTimeout(() => {
         errorDiv.style.display = 'none';
     }, 3000);
 }
 
+// =====================
+// AUTH CHECK
+// =====================
 function checkAuth() {
     const isLoggedIn = sessionStorage.getItem('userLoggedIn');
     const loginTime = sessionStorage.getItem('loginTime');
-    
-    // Check if session expired (8 hours for staff, 1 hour for admin)
+
     if (isLoggedIn && loginTime) {
-        const currentTime = new Date().getTime();
+        const currentTime = Date.now();
         const timeDiff = currentTime - parseInt(loginTime);
         const userRole = sessionStorage.getItem('userRole');
-        const maxTime = userRole === 'admin' ? 60 * 60 * 1000 : 8 * 60 * 60 * 1000;
-        
+
+        const maxTime = userRole === 'admin'
+            ? 60 * 60 * 1000      // 1 jam
+            : 8 * 60 * 60 * 1000; // 8 jam
+
         if (timeDiff > maxTime) {
             logout();
             return false;
         }
-        
         return true;
     }
-    
     return false;
 }
 
 function logout() {
-    sessionStorage.removeItem('userLoggedIn');
-    sessionStorage.removeItem('userRole');
-    sessionStorage.removeItem('userName');
-    sessionStorage.removeItem('userId');
-    sessionStorage.removeItem('loginTime');
+    sessionStorage.clear();
     window.location.href = 'login.html';
 }
 
@@ -100,20 +108,17 @@ function requireRole(allowedRoles) {
         window.location.href = 'login.html';
         return false;
     }
-    
+
     const userRole = sessionStorage.getItem('userRole');
     if (!allowedRoles.includes(userRole)) {
         alert('Anda tidak memiliki akses ke halaman ini!');
-        if (userRole === 'cashier') {
-            window.location.href = 'cashier.html';
-        } else if (userRole === 'waiter') {
-            window.location.href = 'waiter.html';
-        } else {
-            window.location.href = 'dashboard.html';
-        }
+        window.location.href = userRole === 'cashier'
+            ? 'cashier.html'
+            : userRole === 'waiter'
+            ? 'waiter.html'
+            : 'dashboard.html';
         return false;
     }
-    
     return true;
 }
 
