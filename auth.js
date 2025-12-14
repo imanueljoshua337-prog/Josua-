@@ -1,4 +1,6 @@
 // auth.js - FIX FINAL
+console.log('DB:', DB);
+console.log('database:', window.database);
 
 async function handleLogin(event) {
     event.preventDefault();
@@ -63,3 +65,4 @@ function showError(message) {
         errorDiv.style.display = 'none';
     }, 3000);
 }
+
