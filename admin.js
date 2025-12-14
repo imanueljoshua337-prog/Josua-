@@ -1,54 +1,23 @@
-// admin-firebase.js - Admin Panel Scripts with Firebase Realtime
+// admin.js - Admin Panel Scripts
 
 // Dashboard Functions
 function loadDashboard() {
-    // Listen for realtime statistics updates
-    FirebaseDB.listenOrders(orders => {
-        updateDashboardStats(orders);
-        loadRecentOrders(orders);
-    });
+    const stats = DB.getStatistics();
+    
+    document.getElementById('totalOrders').textContent = stats.totalOrders;
+    document.getElementById('completedOrders').textContent = stats.completedOrders;
+    document.getElementById('pendingOrders').textContent = stats.pendingOrders;
+    document.getElementById('totalRevenue').textContent = formatCurrency(stats.totalRevenue);
+    document.getElementById('todayOrders').textContent = stats.todayOrders;
+    document.getElementById('todayRevenue').textContent = formatCurrency(stats.todayRevenue);
+    
+    loadRecentOrders();
 }
 
-function updateDashboardStats(orders) {
-    const today = new Date().toDateString();
-    const todayOrders = orders.filter(order => 
-        new Date(order.createdAt).toDateString() === today
-    );
-    
-    const stats = {
-        totalOrders: orders.length,
-        completedOrders: orders.filter(o => o.status === 'completed').length,
-        pendingOrders: orders.filter(o => o.status === 'pending').length,
-        totalRevenue: orders.filter(o => o.status === 'completed').reduce((sum, o) => sum + o.total, 0),
-        todayOrders: todayOrders.length,
-        todayRevenue: todayOrders.filter(o => o.status === 'completed').reduce((sum, o) => sum + o.total, 0)
-    };
-    
-    if (document.getElementById('totalOrders')) {
-        document.getElementById('totalOrders').textContent = stats.totalOrders;
-    }
-    if (document.getElementById('completedOrders')) {
-        document.getElementById('completedOrders').textContent = stats.completedOrders;
-    }
-    if (document.getElementById('pendingOrders')) {
-        document.getElementById('pendingOrders').textContent = stats.pendingOrders;
-    }
-    if (document.getElementById('totalRevenue')) {
-        document.getElementById('totalRevenue').textContent = formatCurrency(stats.totalRevenue);
-    }
-    if (document.getElementById('todayOrders')) {
-        document.getElementById('todayOrders').textContent = stats.todayOrders;
-    }
-    if (document.getElementById('todayRevenue')) {
-        document.getElementById('todayRevenue').textContent = formatCurrency(stats.todayRevenue);
-    }
-}
-
-function loadRecentOrders(orders) {
+function loadRecentOrders() {
+    const orders = DB.getOrders();
     const recentOrders = orders.slice(-5).reverse();
     const tbody = document.getElementById('recentOrders');
-    
-    if (!tbody) return;
     
     if (recentOrders.length === 0) {
         tbody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada pesanan</td></tr>';
@@ -69,34 +38,31 @@ function loadRecentOrders(orders) {
     });
 }
 
-// Menu Management Functions - Realtime
+// Menu Management Functions
 function loadMenuList() {
-    FirebaseDB.listenMenus(menus => {
-        const tbody = document.getElementById('menuList');
-        
-        if (!tbody) return;
-        
-        if (menus.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada menu</td></tr>';
-            return;
-        }
-        
-        tbody.innerHTML = '';
-        menus.forEach(menu => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${menu.id}</td>
-                <td>${menu.name}</td>
-                <td>${menu.category}</td>
-                <td>${formatCurrency(menu.price)}</td>
-                <td><span class="badge ${menu.available ? 'badge-success' : 'badge-danger'}">${menu.available ? 'Tersedia' : 'Habis'}</span></td>
-                <td>
-                    <button onclick="editMenu('${menu.id}')" class="btn btn-sm btn-primary">Edit</button>
-                    <button onclick="deleteMenu('${menu.id}')" class="btn btn-sm btn-danger">Hapus</button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
+    const menus = DB.getMenus();
+    const tbody = document.getElementById('menuList');
+    
+    if (menus.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center">Tidak ada menu</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = '';
+    menus.forEach(menu => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${menu.id}</td>
+            <td>${menu.name}</td>
+            <td>${menu.category}</td>
+            <td>${formatCurrency(menu.price)}</td>
+            <td><span class="badge ${menu.available ? 'badge-success' : 'badge-danger'}">${menu.available ? 'Tersedia' : 'Habis'}</span></td>
+            <td>
+                <button onclick="editMenu(${menu.id})" class="btn btn-sm btn-primary">Edit</button>
+                <button onclick="deleteMenu(${menu.id})" class="btn btn-sm btn-danger">Hapus</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
     });
 }
 
@@ -107,8 +73,8 @@ function showAddMenuForm() {
     document.getElementById('menuModal').style.display = 'flex';
 }
 
-async function editMenu(id) {
-    const menu = await FirebaseDB.getMenuById(id);
+function editMenu(id) {
+    const menu = DB.getMenuById(id);
     document.getElementById('menuFormTitle').textContent = 'Edit Menu';
     document.getElementById('menuId').value = menu.id;
     document.getElementById('menuName').value = menu.name;
@@ -119,7 +85,7 @@ async function editMenu(id) {
     document.getElementById('menuModal').style.display = 'flex';
 }
 
-async function saveMenu(event) {
+function saveMenu(event) {
     event.preventDefault();
     
     const id = document.getElementById('menuId').value;
@@ -131,60 +97,47 @@ async function saveMenu(event) {
         available: document.getElementById('menuAvailable').checked
     };
     
-    try {
-        if (id) {
-            await FirebaseDB.updateMenu(id, menuData);
-        } else {
-            await FirebaseDB.addMenu(menuData);
-        }
-        
-        closeModal('menuModal');
-        // List will auto-update from realtime listener
-    } catch (error) {
-        console.error('Error saving menu:', error);
-        alert('Terjadi kesalahan saat menyimpan menu');
+    if (id) {
+        DB.updateMenu(parseInt(id), menuData);
+    } else {
+        DB.addMenu(menuData);
     }
+    
+    closeModal('menuModal');
+    loadMenuList();
 }
 
-async function deleteMenu(id) {
+function deleteMenu(id) {
     if (confirm('Yakin ingin menghapus menu ini?')) {
-        try {
-            await FirebaseDB.deleteMenu(id);
-            // List will auto-update from realtime listener
-        } catch (error) {
-            console.error('Error deleting menu:', error);
-            alert('Terjadi kesalahan saat menghapus menu');
-        }
+        DB.deleteMenu(id);
+        loadMenuList();
     }
 }
 
-// Table Management Functions - Realtime
+// Table Management Functions
 function loadTableList() {
-    FirebaseDB.listenTables(tables => {
-        const tbody = document.getElementById('tableList');
-        
-        if (!tbody) return;
-        
-        if (tables.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada meja</td></tr>';
-            return;
-        }
-        
-        tbody.innerHTML = '';
-        tables.forEach(table => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${table.id}</td>
-                <td>Meja ${table.number}</td>
-                <td>${table.capacity} orang</td>
-                <td><span class="status-badge status-${table.status}">${getTableStatusText(table.status)}</span></td>
-                <td>
-                    <button onclick="editTable('${table.id}')" class="btn btn-sm btn-primary">Edit</button>
-                    <button onclick="deleteTable('${table.id}')" class="btn btn-sm btn-danger">Hapus</button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
+    const tables = DB.getTables();
+    const tbody = document.getElementById('tableList');
+    
+    if (tables.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center">Tidak ada meja</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = '';
+    tables.forEach(table => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${table.id}</td>
+            <td>Meja ${table.number}</td>
+            <td>${table.capacity} orang</td>
+            <td><span class="status-badge status-${table.status}">${getTableStatusText(table.status)}</span></td>
+            <td>
+                <button onclick="editTable(${table.id})" class="btn btn-sm btn-primary">Edit</button>
+                <button onclick="deleteTable(${table.id})" class="btn btn-sm btn-danger">Hapus</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
     });
 }
 
@@ -195,8 +148,8 @@ function showAddTableForm() {
     document.getElementById('tableModal').style.display = 'flex';
 }
 
-async function editTable(id) {
-    const table = await FirebaseDB.getTableById(id);
+function editTable(id) {
+    const table = DB.getTableById(id);
     document.getElementById('tableFormTitle').textContent = 'Edit Meja';
     document.getElementById('tableId').value = table.id;
     document.getElementById('tableNumber').value = table.number;
@@ -205,7 +158,7 @@ async function editTable(id) {
     document.getElementById('tableModal').style.display = 'flex';
 }
 
-async function saveTable(event) {
+function saveTable(event) {
     event.preventDefault();
     
     const id = document.getElementById('tableId').value;
@@ -215,94 +168,82 @@ async function saveTable(event) {
         status: document.getElementById('tableStatus').value
     };
     
-    try {
-        if (id) {
-            await FirebaseDB.updateTable(id, tableData);
-        } else {
-            await FirebaseDB.addTable(tableData);
-        }
-        
-        closeModal('tableModal');
-    } catch (error) {
-        console.error('Error saving table:', error);
-        alert('Terjadi kesalahan saat menyimpan meja');
+    if (id) {
+        DB.updateTable(parseInt(id), tableData);
+    } else {
+        DB.addTable(tableData);
     }
+    
+    closeModal('tableModal');
+    loadTableList();
 }
 
-async function deleteTable(id) {
+function deleteTable(id) {
     if (confirm('Yakin ingin menghapus meja ini?')) {
-        try {
-            await FirebaseDB.deleteTable(id);
-        } catch (error) {
-            console.error('Error deleting table:', error);
-            alert('Terjadi kesalahan saat menghapus meja');
-        }
+        DB.deleteTable(id);
+        loadTableList();
     }
 }
 
-// Orders Management Functions - Realtime
+// Orders Management Functions
 let currentOrderFilter = 'active';
 
 function loadOrdersList() {
-    FirebaseDB.listenOrders(orders => {
-        const reversedOrders = [...orders].reverse();
-        const tbody = document.getElementById('ordersList');
-        
-        if (!tbody) return;
-        
-        // Update counts
-        const activeOrders = orders.filter(o => o.status === 'pending' || o.status === 'processing');
-        const completedOrders = orders.filter(o => o.status === 'completed');
-        
-        if (document.getElementById('countActive')) {
-            document.getElementById('countActive').textContent = activeOrders.length;
-        }
-        if (document.getElementById('countCompleted')) {
-            document.getElementById('countCompleted').textContent = completedOrders.length;
-        }
-        if (document.getElementById('countAll')) {
-            document.getElementById('countAll').textContent = orders.length;
-        }
-        
-        // Filter based on current filter
-        let filtered;
+    const orders = DB.getOrders().reverse();
+    const tbody = document.getElementById('ordersList');
+    
+    // Update counts
+    const activeOrders = orders.filter(o => o.status === 'pending' || o.status === 'processing');
+    const completedOrders = orders.filter(o => o.status === 'completed');
+    
+    if (document.getElementById('countActive')) {
+        document.getElementById('countActive').textContent = activeOrders.length;
+    }
+    if (document.getElementById('countCompleted')) {
+        document.getElementById('countCompleted').textContent = completedOrders.length;
+    }
+    if (document.getElementById('countAll')) {
+        document.getElementById('countAll').textContent = orders.length;
+    }
+    
+    // Filter based on current filter
+    let filtered;
+    if (currentOrderFilter === 'active') {
+        filtered = activeOrders;
+    } else if (currentOrderFilter === 'completed') {
+        filtered = completedOrders;
+    } else {
+        filtered = orders;
+    }
+    
+    if (filtered.length === 0) {
+        let emptyMessage = 'Tidak ada pesanan';
         if (currentOrderFilter === 'active') {
-            filtered = activeOrders;
+            emptyMessage = 'Tidak ada pesanan aktif';
         } else if (currentOrderFilter === 'completed') {
-            filtered = completedOrders;
-        } else {
-            filtered = reversedOrders;
+            emptyMessage = 'Belum ada pesanan selesai';
         }
-        
-        if (filtered.length === 0) {
-            let emptyMessage = 'Tidak ada pesanan';
-            if (currentOrderFilter === 'active') {
-                emptyMessage = 'Tidak ada pesanan aktif';
-            } else if (currentOrderFilter === 'completed') {
-                emptyMessage = 'Belum ada pesanan selesai';
-            }
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center">${emptyMessage}</td></tr>`;
-            return;
-        }
-        
-        tbody.innerHTML = '';
-        filtered.forEach(order => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${order.orderNumber}</td>
-                <td>Meja ${order.tableNumber}</td>
-                <td>${order.items.length} item</td>
-                <td>${formatCurrency(order.total)}</td>
-                <td><span class="status-badge status-${order.status}">${getStatusText(order.status)}</span></td>
-                <td>${formatDateTime(order.createdAt)}</td>
-                <td>
-                    <button onclick="viewOrder('${order.id}')" class="btn btn-sm btn-primary">Detail</button>
-                    ${order.status === 'pending' ? `<button onclick="updateOrderStatus('${order.id}', 'processing')" class="btn btn-sm btn-success">Proses</button>` : ''}
-                    ${order.status === 'processing' ? `<button onclick="updateOrderStatus('${order.id}', 'completed')" class="btn btn-sm btn-success">Selesai</button>` : ''}
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center">${emptyMessage}</td></tr>`;
+        return;
+    }
+    
+    tbody.innerHTML = '';
+    filtered.forEach(order => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${order.orderNumber}</td>
+            <td>Meja ${order.tableNumber}</td>
+            <td>${order.items.length} item</td>
+            <td>${formatCurrency(order.total)}</td>
+            <td><span class="status-badge status-${order.status}">${getStatusText(order.status)}</span></td>
+            <td>${formatDateTime(order.createdAt)}</td>
+            <td>
+                <button onclick="viewOrder(${order.id})" class="btn btn-sm btn-primary">Detail</button>
+                ${order.status === 'pending' ? `<button onclick="updateOrderStatus(${order.id}, 'processing')" class="btn btn-sm btn-success">Proses</button>` : ''}
+                ${order.status === 'processing' ? `<button onclick="updateOrderStatus(${order.id}, 'completed')" class="btn btn-sm btn-success">Selesai</button>` : ''}
+            </td>
+        `;
+        tbody.appendChild(tr);
     });
 }
 
@@ -315,12 +256,11 @@ function filterOrderStatus(status) {
     });
     document.querySelector(`[data-tab="${status}"]`).classList.add('active');
     
-    // Re-trigger the listener to refresh display
     loadOrdersList();
 }
 
-async function viewOrder(id) {
-    const order = await FirebaseDB.getOrderById(id);
+function viewOrder(id) {
+    const order = DB.getOrderById(id);
     const modal = document.getElementById('orderDetailModal');
     
     document.getElementById('detailOrderNumber').textContent = order.orderNumber;
@@ -345,6 +285,7 @@ async function viewOrder(id) {
     document.getElementById('detailService').textContent = formatCurrency(order.service);
     document.getElementById('detailTotal').textContent = formatCurrency(order.total);
     
+    // Handle notes - check if element exists and if notes exist
     const notesElement = document.getElementById('detailNotes');
     const notesTextElement = document.getElementById('detailNotesText');
     
@@ -362,19 +303,280 @@ async function viewOrder(id) {
     modal.style.display = 'flex';
 }
 
-async function updateOrderStatus(id, status) {
-    try {
-        await FirebaseDB.updateOrder(id, { status: status });
-        
-        if (status === 'completed') {
-            const order = await FirebaseDB.getOrderById(id);
-            await FirebaseDB.updateTable(order.tableId, { status: 'available' });
+function updateOrderStatus(id, status) {
+    const order = DB.getOrderById(id);
+    DB.updateOrder(id, { status: status });
+    
+    if (status === 'completed') {
+        DB.updateTable(order.tableId, { status: 'available' });
+    }
+    
+    loadOrdersList();
+}
+
+// Settings Functions
+function loadSettings() {
+    const settings = DB.getSettings();
+    document.getElementById('restaurantName').value = settings.restaurantName;
+    document.getElementById('taxPercent').value = settings.taxPercent;
+    document.getElementById('servicePercent').value = settings.serviceChargePercent;
+    
+    const admin = DB.getAdmin();
+    document.getElementById('adminUsername').value = admin.username;
+}
+
+// Staff Management Functions
+function loadStaffStats() {
+    const staff = DB.getStaff();
+    const cashiers = staff.filter(s => s.role === 'cashier');
+    const waiters = staff.filter(s => s.role === 'waiter');
+    
+    document.getElementById('totalStaff').textContent = staff.length;
+    document.getElementById('totalCashiers').textContent = cashiers.length;
+    document.getElementById('totalWaiters').textContent = waiters.length;
+}
+
+function loadStaffList() {
+    const staff = DB.getStaff();
+    const tbody = document.getElementById('staffList');
+    
+    if (staff.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center">Tidak ada staff</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = '';
+    staff.forEach(s => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${s.id}</td>
+            <td>${s.name}</td>
+            <td>${s.username}</td>
+            <td><span class="badge ${s.role === 'cashier' ? 'badge-success' : 'badge-info'}">${getRoleText(s.role)}</span></td>
+            <td>${s.phone}</td>
+            <td>${formatDate(s.joinDate)}</td>
+            <td><span class="status-badge ${s.status === 'active' ? 'status-completed' : 'status-cancelled'}">${s.status === 'active' ? 'Aktif' : 'Tidak Aktif'}</span></td>
+            <td>
+                <button onclick="editStaff(${s.id})" class="btn btn-sm btn-primary">Edit</button>
+                <button onclick="deleteStaff(${s.id})" class="btn btn-sm btn-danger">Hapus</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function showAddStaffForm() {
+    document.getElementById('staffFormTitle').textContent = 'Tambah Staff Baru';
+    document.getElementById('staffForm').reset();
+    document.getElementById('staffId').value = '';
+    document.getElementById('staffPassword').required = true;
+    document.getElementById('staffModal').style.display = 'flex';
+}
+
+function editStaff(id) {
+    const staff = DB.getStaffById(id);
+    document.getElementById('staffFormTitle').textContent = 'Edit Staff';
+    document.getElementById('staffId').value = staff.id;
+    document.getElementById('staffName').value = staff.name;
+    document.getElementById('staffUsername').value = staff.username;
+    document.getElementById('staffPassword').value = '';
+    document.getElementById('staffPassword').required = false;
+    document.getElementById('staffRole').value = staff.role;
+    document.getElementById('staffPhone').value = staff.phone;
+    document.getElementById('staffStatus').value = staff.status;
+    document.getElementById('staffModal').style.display = 'flex';
+}
+
+function saveStaff(event) {
+    event.preventDefault();
+    
+    const id = document.getElementById('staffId').value;
+    const password = document.getElementById('staffPassword').value;
+    
+    const staffData = {
+        name: document.getElementById('staffName').value,
+        username: document.getElementById('staffUsername').value,
+        role: document.getElementById('staffRole').value,
+        phone: document.getElementById('staffPhone').value,
+        status: document.getElementById('staffStatus').value
+    };
+    
+    // Only update password if provided
+    if (password) {
+        staffData.password = password;
+    }
+    
+    if (id) {
+        // Check if password should be kept
+        if (!password) {
+            const existingStaff = DB.getStaffById(parseInt(id));
+            staffData.password = existingStaff.password;
         }
-        // List will auto-update from realtime listener
-    } catch (error) {
-        console.error('Error updating order:', error);
-        alert('Terjadi kesalahan saat update status');
+        DB.updateStaff(parseInt(id), staffData);
+    } else {
+        staffData.password = password;
+        DB.addStaff(staffData);
+    }
+    
+    closeModal('staffModal');
+    loadStaffList();
+    loadStaffStats();
+}
+
+function deleteStaff(id) {
+    if (confirm('Yakin ingin menghapus staff ini?')) {
+        DB.deleteStaff(id);
+        loadStaffList();
+        loadStaffStats();
     }
 }
 
-// Continue in next part...
+function getRoleText(role) {
+    const roleMap = {
+        'cashier': 'Kasir',
+        'waiter': 'Pelayan'
+    };
+    return roleMap[role] || role;
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('id-ID', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+}
+
+// Settings Functions (original)
+function saveSettings(event) {
+    event.preventDefault();
+    
+    const settings = {
+        restaurantName: document.getElementById('restaurantName').value,
+        taxPercent: parseInt(document.getElementById('taxPercent').value),
+        serviceChargePercent: parseInt(document.getElementById('servicePercent').value)
+    };
+    
+    DB.updateSettings(settings);
+    alert('Pengaturan berhasil disimpan!');
+}
+
+function changePassword(event) {
+    event.preventDefault();
+    
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    const admin = DB.getAdmin();
+    
+    if (currentPassword !== admin.password) {
+        alert('Password lama salah!');
+        return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+        alert('Password baru tidak cocok!');
+        return;
+    }
+    
+    if (newPassword.length < 6) {
+        alert('Password minimal 6 karakter!');
+        return;
+    }
+    
+    DB.updateAdmin({
+        username: admin.username,
+        password: newPassword
+    });
+    
+    alert('Password berhasil diubah!');
+    document.getElementById('passwordForm').reset();
+}
+
+// Report Functions
+function loadReports() {
+    const stats = DB.getStatistics();
+    const orders = DB.getOrders();
+    
+    document.getElementById('reportTotalOrders').textContent = stats.totalOrders;
+    document.getElementById('reportCompletedOrders').textContent = stats.completedOrders;
+    document.getElementById('reportTotalRevenue').textContent = formatCurrency(stats.totalRevenue);
+    document.getElementById('reportTodayRevenue').textContent = formatCurrency(stats.todayRevenue);
+    
+    // Best selling items
+    const itemCount = {};
+    orders.forEach(order => {
+        order.items.forEach(item => {
+            if (!itemCount[item.name]) {
+                itemCount[item.name] = 0;
+            }
+            itemCount[item.name] += item.quantity;
+        });
+    });
+    
+    const sortedItems = Object.entries(itemCount)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+    
+    const bestSelling = document.getElementById('bestSellingItems');
+    bestSelling.innerHTML = '';
+    sortedItems.forEach(([name, count], index) => {
+        const div = document.createElement('div');
+        div.className = 'best-selling-item';
+        div.innerHTML = `
+            <span class="rank">${index + 1}</span>
+            <span class="item-name">${name}</span>
+            <span class="item-count">${count} terjual</span>
+        `;
+        bestSelling.appendChild(div);
+    });
+}
+
+// Modal Functions
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+// Utility Functions
+function formatCurrency(amount) {
+    return 'Rp ' + amount.toLocaleString('id-ID');
+}
+
+function formatDateTime(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleString('id-ID', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function getStatusText(status) {
+    const statusMap = {
+        'pending': 'Pending',
+        'processing': 'Diproses',
+        'completed': 'Selesai',
+        'cancelled': 'Dibatalkan'
+    };
+    return statusMap[status] || status;
+}
+
+function getTableStatusText(status) {
+    const statusMap = {
+        'available': 'Tersedia',
+        'occupied': 'Terisi',
+        'reserved': 'Dipesan'
+    };
+    return statusMap[status] || status;
+}
+
+// Close modals when clicking outside
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+    }
+}
