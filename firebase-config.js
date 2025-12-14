@@ -17,4 +17,6 @@ firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 const storage = firebase.storage();
 
+window.database = database;
+
 console.log('🔥 Firebase initialized successfully');
