@@ -1,37 +1,32 @@
-// order-firebase.js - Script untuk halaman pemesanan dengan Firebase
+// order.js - Script untuk halaman pemesanan
 
 let cart = [];
 let settings = {};
 
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', function() {
     // Cek apakah meja sudah dipilih
     const selectedTable = sessionStorage.getItem('selectedTableNumber');
     if (!selectedTable) {
         alert('Silakan pilih meja terlebih dahulu');
-        window.location.href = 'index-firebase.html';
+        window.location.href = 'index.html';
         return;
     }
 
-    await loadSettings();
+    loadSettings();
     loadRestaurantName();
     displayTableNumber();
     loadMenus();
     setupCategoryFilter();
 });
 
-async function loadSettings() {
-    settings = await FirebaseDB.getSettings();
+function loadSettings() {
+    settings = DB.getSettings();
     document.getElementById('taxPercent').textContent = settings.taxPercent;
     document.getElementById('servicePercent').textContent = settings.serviceChargePercent;
 }
 
 function loadRestaurantName() {
-    // Listen for realtime updates
-    FirebaseDB.listenSettings(newSettings => {
-        if (newSettings) {
-            document.getElementById('restaurantName').textContent = newSettings.restaurantName;
-        }
-    });
+    document.getElementById('restaurantName').textContent = settings.restaurantName;
 }
 
 function displayTableNumber() {
@@ -40,38 +35,32 @@ function displayTableNumber() {
 }
 
 function loadMenus(category = 'all') {
-    // Listen for realtime menu updates
-    FirebaseDB.listenMenus(menus => {
-        const menuList = document.getElementById('menuList');
-        menuList.innerHTML = '';
+    const menus = DB.getMenus();
+    const menuList = document.getElementById('menuList');
+    
+    menuList.innerHTML = '';
+    
+    const filteredMenus = category === 'all' 
+        ? menus.filter(m => m.available)
+        : menus.filter(m => m.available && m.category === category);
+    
+    filteredMenus.forEach(menu => {
+        const menuCard = document.createElement('div');
+        menuCard.className = 'menu-card';
         
-        const filteredMenus = category === 'all' 
-            ? menus.filter(m => m.available)
-            : menus.filter(m => m.available && m.category === category);
+        menuCard.innerHTML = `
+            <div class="menu-image" style="background-image: url('${menu.image}')"></div>
+            <div class="menu-info">
+                <h3>${menu.name}</h3>
+                <p class="menu-category">${menu.category}</p>
+                <p class="menu-price">${formatCurrency(menu.price)}</p>
+                <button class="btn btn-primary btn-sm" onclick="addToCart(${menu.id})">
+                    + Tambah
+                </button>
+            </div>
+        `;
         
-        if (filteredMenus.length === 0) {
-            menuList.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--gray-color);">Tidak ada menu tersedia</div>';
-            return;
-        }
-        
-        filteredMenus.forEach(menu => {
-            const menuCard = document.createElement('div');
-            menuCard.className = 'menu-card';
-            
-            menuCard.innerHTML = `
-                <div class="menu-image" style="background-image: url('${menu.image}')"></div>
-                <div class="menu-info">
-                    <h3>${menu.name}</h3>
-                    <p class="menu-category">${menu.category}</p>
-                    <p class="menu-price">${formatCurrency(menu.price)}</p>
-                    <button class="btn btn-primary btn-sm" onclick="addToCart('${menu.id}', '${menu.name}', ${menu.price})">
-                        + Tambah
-                    </button>
-                </div>
-            `;
-            
-            menuList.appendChild(menuCard);
-        });
+        menuList.appendChild(menuCard);
     });
 }
 
@@ -89,16 +78,18 @@ function setupCategoryFilter() {
     });
 }
 
-function addToCart(menuId, menuName, menuPrice) {
+function addToCart(menuId) {
+    const menu = DB.getMenuById(menuId);
+    
     const existingItem = cart.find(item => item.id === menuId);
     
     if (existingItem) {
         existingItem.quantity++;
     } else {
         cart.push({
-            id: menuId,
-            name: menuName,
-            price: menuPrice,
+            id: menu.id,
+            name: menu.name,
+            price: menu.price,
             quantity: 1
         });
     }
@@ -149,10 +140,10 @@ function updateCart() {
                 <p>${formatCurrency(item.price)}</p>
             </div>
             <div class="cart-item-controls">
-                <button class="btn-qty" onclick="updateQuantity('${item.id}', -1)">-</button>
+                <button class="btn-qty" onclick="updateQuantity(${item.id}, -1)">-</button>
                 <span class="qty">${item.quantity}</span>
-                <button class="btn-qty" onclick="updateQuantity('${item.id}', 1)">+</button>
-                <button class="btn-remove" onclick="removeFromCart('${item.id}')">🗑️</button>
+                <button class="btn-qty" onclick="updateQuantity(${item.id}, 1)">+</button>
+                <button class="btn-remove" onclick="removeFromCart(${item.id})">🗑️</button>
             </div>
             <div class="cart-item-total">
                 ${formatCurrency(item.price * item.quantity)}
@@ -177,13 +168,13 @@ function updateCart() {
     cartActions.style.display = 'block';
 }
 
-async function placeOrder() {
+function placeOrder() {
     if (cart.length === 0) {
         alert('Keranjang masih kosong!');
         return;
     }
     
-    const tableId = sessionStorage.getItem('selectedTable');
+    const tableId = parseInt(sessionStorage.getItem('selectedTable'));
     const tableNumber = sessionStorage.getItem('selectedTableNumber');
     const notes = document.getElementById('orderNotes').value;
     
@@ -204,29 +195,16 @@ async function placeOrder() {
         status: 'pending'
     };
     
-    try {
-        // Show loading
-        const btn = event.target;
-        btn.disabled = true;
-        btn.textContent = 'Memproses...';
-        
-        // Add order to Firebase
-        const savedOrder = await FirebaseDB.addOrder(order);
-        
-        // Update table status
-        await FirebaseDB.updateTable(tableId, { status: 'occupied' });
-        
-        // Save order ID to session
-        sessionStorage.setItem('lastOrderId', savedOrder.id);
-        
-        // Redirect to success page
-        window.location.href = 'success-firebase.html';
-    } catch (error) {
-        console.error('Error placing order:', error);
-        alert('Terjadi kesalahan saat memesan. Silakan coba lagi.');
-        btn.disabled = false;
-        btn.textContent = 'Pesan Sekarang';
-    }
+    const savedOrder = DB.addOrder(order);
+    
+    // Update table status
+    DB.updateTable(tableId, { status: 'occupied' });
+    
+    // Save order ID to session
+    sessionStorage.setItem('lastOrderId', savedOrder.id);
+    
+    // Redirect to success page
+    window.location.href = 'success.html';
 }
 
 function formatCurrency(amount) {
