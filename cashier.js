@@ -1,4 +1,4 @@
-// cashier-firebase.js - Cashier Dashboard Scripts with Firebase
+// cashier.js - Cashier Dashboard Scripts
 
 function loadCashierDashboard() {
     const userInfo = getUserInfo();
@@ -12,14 +12,12 @@ function loadCashierDashboard() {
         document.getElementById('waiterName').textContent = userInfo.name;
     }
     
-    // Listen untuk realtime updates
-    FirebaseDB.listenOrders(orders => {
-        loadCashierStats(orders);
-        loadPaymentMethodStats(orders);
-    });
+    loadCashierStats();
+    loadPaymentMethodStats();
 }
 
-function loadCashierStats(orders) {
+function loadCashierStats() {
+    const orders = DB.getOrders();
     const today = new Date().toDateString();
     
     const todayOrders = orders.filter(order => 
@@ -46,7 +44,8 @@ function loadCashierStats(orders) {
     }
 }
 
-function loadPaymentMethodStats(orders) {
+function loadPaymentMethodStats() {
+    const orders = DB.getOrders();
     const today = new Date().toDateString();
     
     const todayCompleted = orders.filter(order => 
