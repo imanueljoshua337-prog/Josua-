@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - Restoran Digital</title>
-    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="admin.css">
 </head>
 <body class="login-page">
     <div class="login-container">
@@ -27,7 +27,7 @@
                 
                 <div id="errorMessage" class="error-message" style="display: none;"></div>
                 
-                <button type="submit" class="btn btn-primary btn-block" id="loginBtn">Login</button>
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
             </form>
             
             <div class="login-footer">
@@ -37,48 +37,12 @@
                     <p style="margin-bottom: 8px;">💵 <strong>Kasir:</strong> username: <code>kasir1</code>, password: <code>kasir123</code></p>
                     <p>🍽️ <strong>Pelayan:</strong> username: <code>pegawai1</code>, password: <code>pegawai123</code></p>
                 </div>
-                <a href="../index-firebase.html">← Kembali ke Beranda</a>
+                <a href="index.html">← Kembali ke Beranda</a>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDK (URUTAN PENTING!) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-    
-    <!-- Firebase Config & DB -->
-    <script src="firebase-config.js"></script>
-    <script src="firebase-db.js"></script>
-    
-    <!-- Auth Script -->
+    <script src="db.js"></script>
     <script src="auth.js"></script>
-    
-    <!-- Debug Script -->
-    <script>
-        // Debug: Cek apakah Firebase sudah load
-        window.addEventListener('load', function() {
-            console.log('🔥 Firebase Status:', typeof firebase !== 'undefined' ? 'OK' : 'ERROR');
-            console.log('📊 Database Status:', typeof database !== 'undefined' ? 'OK' : 'ERROR');
-            console.log('💾 FirebaseDB Status:', typeof FirebaseDB !== 'undefined' ? 'OK' : 'ERROR');
-            
-            // Test koneksi
-            if (typeof FirebaseDB !== 'undefined') {
-                FirebaseDB.getAdmin()
-                    .then(admin => {
-                        console.log('✅ Firebase Connected! Admin data:', admin);
-                    })
-                    .catch(error => {
-                        console.error('❌ Firebase Error:', error);
-                        document.getElementById('errorMessage').textContent = 'Error koneksi Firebase: ' + error.message;
-                        document.getElementById('errorMessage').style.display = 'block';
-                    });
-            } else {
-                console.error('❌ FirebaseDB tidak terdefinisi!');
-                document.getElementById('errorMessage').textContent = 'Firebase tidak ter-load. Cek console untuk detail.';
-                document.getElementById('errorMessage').style.display = 'block';
-            }
-        });
-    </script>
 </body>
 </html>
