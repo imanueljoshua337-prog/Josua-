@@ -1,28 +1,58 @@
 // db.js - Manajemen Database menggunakan localStorage
 
 const DB = {
+    // Helper function to generate ID based on date
+    generateId(prefix) {
+        const now = new Date();
+        const year = now.getFullYear().toString().slice(-2);
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const datePrefix = year + month + day; // Format: YYMMDD
+        
+        // Get existing items to find the highest counter for today
+        let items = [];
+        if (prefix === 'menu') items = this.getMenus();
+        else if (prefix === 'table') items = this.getTables();
+        else if (prefix === 'staff') items = this.getStaff();
+        else if (prefix === 'order') items = this.getOrders();
+        
+        // Find highest counter for today's date
+        let maxCounter = 0;
+        items.forEach(item => {
+            const itemId = item.id.toString();
+            if (itemId.startsWith(datePrefix)) {
+                const counter = parseInt(itemId.slice(6)); // Get last 4 digits
+                if (counter > maxCounter) maxCounter = counter;
+            }
+        });
+        
+        // Increment counter
+        const newCounter = String(maxCounter + 1).padStart(4, '0');
+        return parseInt(datePrefix + newCounter);
+    },
+
     // Inisialisasi database dengan data default
     init() {
         if (!localStorage.getItem('menus')) {
             const defaultMenus = [
-                { id: 1, name: 'Nasi Goreng Spesial', price: 25000, category: 'Makanan', image: 'assets/images/nasi-goreng.jpg', available: true },
-                { id: 2, name: 'Mie Goreng', price: 20000, category: 'Makanan', image: 'assets/images/mie-goreng.jpg', available: true },
-                { id: 3, name: 'Ayam Geprek', price: 22000, category: 'Makanan', image: 'assets/images/ayam-geprek.jpg', available: true },
-                { id: 4, name: 'Sate Ayam', price: 30000, category: 'Makanan', image: 'assets/images/sate.jpg', available: true },
-                { id: 5, name: 'Es Teh Manis', price: 5000, category: 'Minuman', image: 'assets/images/es-teh.jpg', available: true },
-                { id: 6, name: 'Es Jeruk', price: 7000, category: 'Minuman', image: 'assets/images/es-jeruk.jpg', available: true },
-                { id: 7, name: 'Jus Alpukat', price: 12000, category: 'Minuman', image: 'assets/images/jus-alpukat.jpg', available: true }
+                { id: 251218001, name: 'Nasi Goreng Spesial', price: 25000, category: 'Makanan', image: 'assets/images/nasi-goreng.jpg', available: true },
+                { id: 2512180002, name: 'Mie Goreng', price: 20000, category: 'Makanan', image: 'assets/images/mie-goreng.jpg', available: true },
+                { id: 2512180003, name: 'Ayam Geprek', price: 22000, category: 'Makanan', image: 'assets/images/ayam-geprek.jpg', available: true },
+                { id: 2512180004, name: 'Sate Ayam', price: 30000, category: 'Makanan', image: 'assets/images/sate.jpg', available: true },
+                { id: 2512180005, name: 'Es Teh Manis', price: 5000, category: 'Minuman', image: 'assets/images/es-teh.jpg', available: true },
+                { id: 2512180006, name: 'Es Jeruk', price: 7000, category: 'Minuman', image: 'assets/images/es-jeruk.jpg', available: true },
+                { id: 2512180007, name: 'Jus Alpukat', price: 12000, category: 'Minuman', image: 'assets/images/jus-alpukat.jpg', available: true }
             ];
             localStorage.setItem('menus', JSON.stringify(defaultMenus));
         }
 
         if (!localStorage.getItem('tables')) {
             const defaultTables = [
-                { id: 1, number: 1, capacity: 4, status: 'available' },
-                { id: 2, number: 2, capacity: 2, status: 'available' },
-                { id: 3, number: 3, capacity: 6, status: 'available' },
-                { id: 4, number: 4, capacity: 4, status: 'available' },
-                { id: 5, number: 5, capacity: 8, status: 'available' }
+                { id: 2512180001, number: 1, capacity: 4, status: 'available' },
+                { id: 2512180002, number: 2, capacity: 2, status: 'available' },
+                { id: 2512180003, number: 3, capacity: 6, status: 'available' },
+                { id: 2512180004, number: 4, capacity: 4, status: 'available' },
+                { id: 2512180005, number: 5, capacity: 8, status: 'available' }
             ];
             localStorage.setItem('tables', JSON.stringify(defaultTables));
         }
@@ -42,10 +72,10 @@ const DB = {
 
         if (!localStorage.getItem('staff')) {
             const defaultStaff = [
-                { id: 1, name: 'Budi Santoso', username: 'kasir1', password: 'kasir123', role: 'cashier', phone: '081234567890', status: 'active', joinDate: '2024-01-15' },
-                { id: 2, name: 'Siti Rahma', username: 'kasir2', password: 'kasir123', role: 'cashier', phone: '081234567891', status: 'active', joinDate: '2024-02-01' },
-                { id: 3, name: 'Ahmad Yusuf', username: 'pegawai1', password: 'pegawai123', role: 'waiter', phone: '081234567892', status: 'active', joinDate: '2024-01-20' },
-                { id: 4, name: 'Dewi Lestari', username: 'pegawai2', password: 'pegawai123', role: 'waiter', phone: '081234567893', status: 'active', joinDate: '2024-02-10' }
+                { id: 2512180001, name: 'Budi Santoso', username: 'kasir1', password: 'kasir123', role: 'cashier', phone: '081234567890', status: 'active', joinDate: '2024-01-15' },
+                { id: 2512180002, name: 'Siti Rahma', username: 'kasir2', password: 'kasir123', role: 'cashier', phone: '081234567891', status: 'active', joinDate: '2024-02-01' },
+                { id: 2512180003, name: 'Ahmad Yusuf', username: 'pegawai1', password: 'pegawai123', role: 'waiter', phone: '081234567892', status: 'active', joinDate: '2024-01-20' },
+                { id: 2512180004, name: 'Dewi Lestari', username: 'pegawai2', password: 'pegawai123', role: 'waiter', phone: '081234567893', status: 'active', joinDate: '2024-02-10' }
             ];
             localStorage.setItem('staff', JSON.stringify(defaultStaff));
         }
@@ -72,7 +102,7 @@ const DB = {
 
     addMenu(menu) {
         const menus = this.getMenus();
-        menu.id = Date.now();
+        menu.id = this.generateId('menu');
         menus.push(menu);
         localStorage.setItem('menus', JSON.stringify(menus));
         return menu;
@@ -102,7 +132,7 @@ const DB = {
 
     addTable(table) {
         const tables = this.getTables();
-        table.id = Date.now();
+        table.id = this.generateId('table');
         tables.push(table);
         localStorage.setItem('tables', JSON.stringify(tables));
         return table;
@@ -132,7 +162,7 @@ const DB = {
 
     addOrder(order) {
         const orders = this.getOrders();
-        order.id = Date.now();
+        order.id = this.generateId('order');
         order.orderNumber = 'ORD-' + order.id;
         order.createdAt = new Date().toISOString();
         orders.push(order);
@@ -187,7 +217,7 @@ const DB = {
 
     addStaff(staffData) {
         const staff = this.getStaff();
-        staffData.id = Date.now();
+        staffData.id = this.generateId('staff');
         staffData.joinDate = new Date().toISOString().split('T')[0];
         staff.push(staffData);
         localStorage.setItem('staff', JSON.stringify(staff));
